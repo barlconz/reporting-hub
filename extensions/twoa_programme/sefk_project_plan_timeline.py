@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 import json
 from datetime import date
+from itertools import count
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -71,6 +72,7 @@ from extensions.twoa_programme.sef_project_plan_timeline import (
     _bar_tooltip,
     _child_keys_for_types,
     _fetch_children,
+    _is_milestone_row,
     _issue_start_sort_key,
     _issue_timeline_row,
     _issue_type_name,
@@ -238,6 +240,10 @@ SEFK_EXTRA_CSS = """
   max-height: none;
   overflow-x: auto;
   overflow-y: visible;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f4f7fb;
+  padding: 12px;
 }
 .chart-wrap-sefk svg {
   display: block;
@@ -295,19 +301,45 @@ SEFK_EXTRA_CSS = """
     gap: 8px;
     margin: 0 0 10px;
 }
-.sefk-view-controls button {
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--card-bg);
+.sefk-view-controls button,
+.sefk-filter-controls button {
+    border: 1px solid #c3ccda;
+    border-bottom-color: #a9b6cc;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffffff 0%, #f4f7fc 100%);
     color: var(--text);
     cursor: pointer;
-    padding: 5px 10px;
     font: inherit;
     font-size: 12px;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 1px 2px rgba(9, 30, 66, 0.16),
+        0 1px 0 rgba(9, 30, 66, 0.05);
+    transition: box-shadow 120ms ease, transform 60ms ease, background 120ms ease;
 }
-.sefk-view-controls button.is-active {
-    background: #deebff;
-    border-color: #4c6fff;
+.sefk-view-controls button {
+    padding: 5px 12px;
+}
+.sefk-view-controls button:hover,
+.sefk-filter-controls button:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #eaf0fb 100%);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.8) inset,
+        0 3px 6px rgba(9, 30, 66, 0.22);
+}
+.sefk-view-controls button:active,
+.sefk-filter-controls button:active {
+    box-shadow: 0 1px 3px rgba(9, 30, 66, 0.22) inset;
+    transform: translateY(1px);
+}
+.sefk-view-controls button.is-active,
+.sefk-filter-controls button.is-active {
+    background: linear-gradient(180deg, #588aff 0%, #2f4fe0 100%);
+    border-color: #2444c9;
+    color: #ffffff;
+    box-shadow:
+        0 1px 3px rgba(9, 30, 66, 0.35) inset,
+        0 1px 0 rgba(255, 255, 255, 0.2) inset;
 }
 .sefk-filter-controls {
     display: flex;
@@ -316,18 +348,7 @@ SEFK_EXTRA_CSS = """
     margin: 0 0 10px;
 }
 .sefk-filter-controls button {
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--card-bg);
-    color: var(--text);
-    cursor: pointer;
     padding: 4px 9px;
-    font: inherit;
-    font-size: 12px;
-}
-.sefk-filter-controls button.is-active {
-    background: #deebff;
-    border-color: #4c6fff;
 }
 .sefk-dependency-connector {
     cursor: help;
@@ -375,6 +396,7 @@ SEFK_COLLAPSE_SCRIPT = """
   var SUB_PHASE_ROW_H = cfg('sub-phase-row-h', 36);
   var WORK_STREAM_ROW_H = cfg('work-stream-row-h', 24);
   var EPIC_ROW_H = cfg('epic-row-h', 22);
+  var LEVEL_ZERO_ROW_H = cfg('level-zero-row-h', 20);
 
   function parseManifest(attr) {
     var el = document.getElementById('sefk-cm-sp');
@@ -394,6 +416,33 @@ SEFK_COLLAPSE_SCRIPT = """
         } catch (_err) {
             return {};
         }
+    }
+
+    function blockedByMap(svg) {
+        var map = {};
+        svg.querySelectorAll('[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+            var from = (node.getAttribute('data-sef-dep-from') || '').trim();
+            var to = (node.getAttribute('data-sef-dep-to') || '').trim();
+            if (!from || !to) return;
+            (map[to] = map[to] || []).push(from);
+        });
+        return map;
+    }
+
+    function withAntecedents(keys, blockedBy) {
+        var visible = {};
+        var queue = keys.slice();
+        queue.forEach(function (key) { visible[key] = true; });
+        while (queue.length) {
+            var current = queue.shift();
+            (blockedBy[current] || []).forEach(function (antecedent) {
+                if (!visible[antecedent]) {
+                    visible[antecedent] = true;
+                    queue.push(antecedent);
+                }
+            });
+        }
+        return visible;
     }
 
   function resizeSvg(svg, delta) {
@@ -448,7 +497,11 @@ SEFK_COLLAPSE_SCRIPT = """
         var scaleY = viewBox[3] / svgRect.height;
 
         function barRect(key) {
-            var bar = svg.querySelector('[data-sef-key="' + key + '"][data-sef-role$="-bar"] rect');
+            var bar = svg.querySelector(
+                '[data-sef-key="' + key + '"][data-sef-role$="-bar"] rect, ' +
+                '[data-sef-key="' + key + '"][data-sef-role$="-bar"] polygon, ' +
+                '[data-sef-key="' + key + '"][data-sef-role$="-bar"] image'
+            );
             return bar ? bar.getBoundingClientRect() : null;
         }
         function xFor(clientX) { return viewBox[0] + ((clientX - svgRect.left) * scaleX); }
@@ -496,6 +549,10 @@ SEFK_COLLAPSE_SCRIPT = """
         if (!wsGroup) return;
         var cumulativeShift = 0;
         wsGroup.querySelectorAll('.sefk-epic-row').forEach(function (epicGroup) {
+            if (isHidden(epicGroup)) {
+                cumulativeShift -= EPIC_ROW_H;
+                return;
+            }
             epicGroup.setAttribute('transform', cumulativeShift ? ('translate(0,' + cumulativeShift + ')') : 'translate(0,0)');
             var epicKey = (epicGroup.getAttribute('data-epic-key') || '').trim();
             var sub = document.getElementById('sefk-sub-epic-' + epicKey);
@@ -503,6 +560,34 @@ SEFK_COLLAPSE_SCRIPT = """
                 cumulativeShift += parseInt(epicGroup.getAttribute('data-level-zero-h') || '0', 10) || 0;
             }
         });
+    }
+
+    function recomputeEpicH(epicGroups) {
+        var total = 0;
+        epicGroups.forEach(function (epicGroup) {
+            if (isHidden(epicGroup)) return;
+            total += EPIC_ROW_H;
+            var epicKey = (epicGroup.getAttribute('data-epic-key') || '').trim();
+            var sub = document.getElementById('sefk-sub-epic-' + epicKey);
+            if (sub && !isHidden(sub)) {
+                total += parseInt(epicGroup.getAttribute('data-level-zero-h') || '0', 10) || 0;
+            }
+        });
+        return total;
+    }
+
+    function reflowWorkStreamEpicVisibility(wsGroup, epicGroups, svg) {
+        var oldEpicH = parseInt(wsGroup.getAttribute('data-epic-h') || '0', 10) || 0;
+        var newEpicH = recomputeEpicH(epicGroups);
+        if (newEpicH === oldEpicH) return;
+        wsGroup.setAttribute('data-epic-h', String(newEpicH));
+        reflowWorkStreamEpics(wsGroup);
+        var spKey = (wsGroup.getAttribute('data-sp-key') || '').trim();
+        if (spKey) {
+            reflowSubPhaseContent(spKey);
+            reflowSubPhaseBlocks();
+        }
+        resizeSvg(svg, newEpicH - oldEpicH);
     }
 
   function reflowSubPhaseContent(spKey) {
@@ -545,6 +630,141 @@ SEFK_COLLAPSE_SCRIPT = """
             cumulativeShift += currentSubH - baseSubH;
     });
   }
+
+    function reflowEpicLevelZeroHeight(epicGroup, newH, svg) {
+        var oldH = parseInt(epicGroup.getAttribute('data-level-zero-h') || '0', 10) || 0;
+        if (newH === oldH) return;
+        epicGroup.setAttribute('data-level-zero-h', String(newH));
+        var wsGroup = epicGroup.closest('[id^="sefk-ws-"]');
+        var spKey = wsGroup ? (wsGroup.getAttribute('data-sp-key') || '').trim() : '';
+        if (wsGroup) {
+            var epicH = parseInt(wsGroup.getAttribute('data-epic-h') || '0', 10) || 0;
+            wsGroup.setAttribute('data-epic-h', String(epicH + (newH - oldH)));
+            reflowWorkStreamEpics(wsGroup);
+        }
+        if (spKey) {
+            reflowSubPhaseContent(spKey);
+            reflowSubPhaseBlocks();
+        }
+        resizeSvg(svg, newH - oldH);
+    }
+
+    function resetAllLevelZeroRowFilters(svg) {
+        svg.querySelectorAll('.sefk-epic-row').forEach(function (epicGroup) {
+            var baseH = parseInt(epicGroup.getAttribute('data-level-zero-base-h') || '0', 10) || 0;
+            reflowEpicLevelZeroHeight(epicGroup, baseH, svg);
+            epicGroup.querySelectorAll('.sefk-level-zero-row').forEach(function (row) {
+                row.setAttribute('visibility', 'visible');
+                row.style.display = '';
+                row.setAttribute('transform', 'translate(0,0)');
+            });
+        });
+    }
+
+    function applyLevelZeroRowFilter(svg, visibleKeys) {
+        svg.querySelectorAll('.sefk-epic-row').forEach(function (epicGroup) {
+            var epicKey = (epicGroup.getAttribute('data-epic-key') || '').trim();
+            var sub = document.getElementById('sefk-sub-epic-' + epicKey);
+            if (!sub || isHidden(sub)) return;
+            var rows = epicGroup.querySelectorAll('.sefk-level-zero-row');
+            var visibleIndex = 0;
+            rows.forEach(function (row, idx) {
+                var key = (row.getAttribute('data-level-zero-key') || '').trim();
+                if (visibleKeys[key]) {
+                    var shift = (visibleIndex - idx) * LEVEL_ZERO_ROW_H;
+                    row.setAttribute('transform', 'translate(0,' + shift + ')');
+                    row.setAttribute('visibility', 'visible');
+                    row.style.display = '';
+                    visibleIndex += 1;
+                } else {
+                    row.setAttribute('visibility', 'hidden');
+                    row.style.display = 'none';
+                }
+            });
+            reflowEpicLevelZeroHeight(epicGroup, visibleIndex * LEVEL_ZERO_ROW_H, svg);
+        });
+    }
+
+    function resetEpicVisibilityFilter(svg) {
+        svg.querySelectorAll('[id^="sefk-sub-ws-"]').forEach(function (subWs) {
+            var epicGroups = Array.prototype.slice.call(subWs.querySelectorAll(':scope > .sefk-epic-row'));
+            if (!epicGroups.length) return;
+            var anyHidden = epicGroups.some(function (g) { return isHidden(g); });
+            if (!anyHidden) return;
+            epicGroups.forEach(function (epicGroup) {
+                epicGroup.setAttribute('visibility', 'visible');
+                epicGroup.style.display = '';
+            });
+            var wsGroup = subWs.closest('[id^="sefk-ws-"]');
+            if (wsGroup) reflowWorkStreamEpicVisibility(wsGroup, epicGroups, svg);
+        });
+    }
+
+    function applyEpicVisibilityFilter(svg, visibleKeys) {
+        svg.querySelectorAll('[id^="sefk-sub-ws-"]').forEach(function (subWs) {
+            if (isHidden(subWs)) return;
+            var epicGroups = Array.prototype.slice.call(subWs.querySelectorAll(':scope > .sefk-epic-row'));
+            if (!epicGroups.length) return;
+            epicGroups.forEach(function (epicGroup) {
+                var epicKey = (epicGroup.getAttribute('data-epic-key') || '').trim();
+                var visible = !!visibleKeys[epicKey];
+                epicGroup.setAttribute('visibility', visible ? 'visible' : 'hidden');
+                epicGroup.style.display = visible ? '' : 'none';
+            });
+            var wsGroup = subWs.closest('[id^="sefk-ws-"]');
+            if (wsGroup) reflowWorkStreamEpicVisibility(wsGroup, epicGroups, svg);
+        });
+    }
+
+    function resetWorkStreamVisibilityFilter(svg) {
+        var affectedSpKeys = {};
+        svg.querySelectorAll('[id^="sefk-ws-"]').forEach(function (wsGroup) {
+            if (isHidden(wsGroup)) {
+                wsGroup.setAttribute('visibility', 'visible');
+                wsGroup.style.display = '';
+                var spKey = (wsGroup.getAttribute('data-sp-key') || '').trim();
+                if (spKey) affectedSpKeys[spKey] = true;
+            }
+        });
+        var totalDelta = 0;
+        Object.keys(affectedSpKeys).forEach(function (spKey) {
+            var border = document.getElementById('sefk-bd-' + spKey);
+            var oldH = border ? (parseInt(border.getAttribute('height') || '0', 10) || 0) : 0;
+            var newH = reflowSubPhaseContent(spKey);
+            totalDelta += newH - oldH;
+        });
+        if (totalDelta !== 0) {
+            reflowSubPhaseBlocks();
+            resizeSvg(svg, totalDelta);
+        }
+    }
+
+    function applyWorkStreamVisibilityFilter(svg, visibleKeys) {
+        var totalDelta = 0;
+        svg.querySelectorAll('[id^="sefk-sub-sp-"]').forEach(function (sub) {
+            if (isHidden(sub)) return;
+            var spKey = sub.id.replace('sefk-sub-sp-', '');
+            var wsKeys = (sub.getAttribute('data-work-stream-keys') || '').split(',').filter(Boolean);
+            var border = document.getElementById('sefk-bd-' + spKey);
+            var oldH = border ? (parseInt(border.getAttribute('height') || '0', 10) || 0) : 0;
+            var changed = false;
+            wsKeys.forEach(function (wsKey) {
+                var wsGroup = document.getElementById('sefk-ws-' + wsKey);
+                if (!wsGroup) return;
+                var visible = !!visibleKeys[wsKey];
+                if (visible === isHidden(wsGroup)) changed = true;
+                wsGroup.setAttribute('visibility', visible ? 'visible' : 'hidden');
+                wsGroup.style.display = visible ? '' : 'none';
+            });
+            if (!changed) return;
+            var newH = reflowSubPhaseContent(spKey);
+            totalDelta += newH - oldH;
+        });
+        if (totalDelta !== 0) {
+            reflowSubPhaseBlocks();
+            resizeSvg(svg, totalDelta);
+        }
+    }
 
   window.sefkToggleWorkStream = function (evt, wsKey) {
     if (evt) evt.stopPropagation();
@@ -767,6 +987,9 @@ SEFK_COLLAPSE_SCRIPT = """
         if (!svg) return;
 
         if (!active) {
+            resetAllLevelZeroRowFilters(svg);
+            resetEpicVisibilityFilter(svg);
+            resetWorkStreamVisibilityFilter(svg);
             svg.querySelectorAll('[data-sef-key]').forEach(function (node) {
                 node.setAttribute('visibility', 'visible');
                 node.style.opacity = '';
@@ -776,24 +999,33 @@ SEFK_COLLAPSE_SCRIPT = """
                 node.style.opacity = '';
             });
             restoreHierarchyExpansionState(svg);
+            refreshDependencyVisibility(svg);
+            refreshDependencyGeometry(svg);
             return;
         }
 
         svg.setAttribute('data-sefk-filter-expansion-state', JSON.stringify(hierarchyExpansionState(svg)));
-        var visibleKeys = {};
+        resetAllLevelZeroRowFilters(svg);
+        resetEpicVisibilityFilter(svg);
+        resetWorkStreamVisibilityFilter(svg);
         var selector = kind === 'dependency'
             ? '[data-sef-has-dependency="1"]'
             : '[data-sef-special="' + kind + '"]';
+        var matchedKeys = [];
         svg.querySelectorAll(selector).forEach(function (node) {
             var key = (node.getAttribute('data-sef-key') || '').trim();
-            if (key) visibleKeys[key] = true;
+            if (key) matchedKeys.push(key);
         });
+
+        // Selected items plus everything that blocks them (their antecedents).
+        var visibleKeys = withAntecedents(matchedKeys, blockedByMap(svg));
+
+        // Collapse the whole hierarchy, then re-expand only the branches that lead to a visible item.
+        window.sefkCollapseAll();
         var parents = dependencyParentMap();
-        if (kind === 'milestone' || kind === 'gate') {
-            Object.keys(visibleKeys).forEach(function (key) {
-                expandHierarchyPath(svg, key, parents);
-            });
-        }
+        Object.keys(visibleKeys).forEach(function (key) {
+            expandHierarchyPath(svg, key, parents);
+        });
         Object.keys(visibleKeys).forEach(function (key) {
             var parent = String(parents[key] || '').trim();
             while (parent && !visibleKeys[parent]) {
@@ -812,6 +1044,11 @@ SEFK_COLLAPSE_SCRIPT = """
             node.setAttribute('visibility', 'visible');
             node.style.opacity = visibleKeys[from] && visibleKeys[to] ? '1' : '0.16';
         });
+        applyLevelZeroRowFilter(svg, visibleKeys);
+        applyEpicVisibilityFilter(svg, visibleKeys);
+        applyWorkStreamVisibilityFilter(svg, visibleKeys);
+        refreshDependencyVisibility(svg);
+        refreshDependencyGeometry(svg);
     };
 
     function setDependencyHighlight(svg, fromKey, toKey, active) {
@@ -856,9 +1093,180 @@ SEFK_COLLAPSE_SCRIPT = """
         });
     }
 
+    function statusDtrainMap() {
+        var el = document.getElementById('sefk-cfg');
+        if (!el) return {};
+        try {
+            return JSON.parse((el.getAttribute('data-status-dtrain-map') || '{}').replace(/&quot;/g, '"'));
+        } catch (_err) {
+            return {};
+        }
+    }
+
+    function parseRowInfo(svg) {
+        var info = {};
+        svg.querySelectorAll('[data-sef-key][data-sef-role$="-bar"]').forEach(function (bar) {
+            var key = (bar.getAttribute('data-sef-key') || '').trim();
+            if (!key || info[key]) return;
+            var titleEl = bar.querySelector('title');
+            var text = titleEl ? (titleEl.textContent || '') : '';
+            var dates = text.match(/Timeline:\\s*(\\d{4}-\\d{2}-\\d{2})\\S*\\s*to\\s*(\\d{4}-\\d{2}-\\d{2})/);
+            if (!dates) return;
+            var statusMatch = text.match(/Status:\\s*(.+)/);
+            info[key] = {
+                start: new Date(dates[1] + 'T00:00:00'),
+                end: new Date(dates[2] + 'T00:00:00'),
+                status: statusMatch ? statusMatch[1].trim() : '',
+                bar: bar
+            };
+        });
+        return info;
+    }
+
+    function fmtDate(d) {
+        return d.toISOString().slice(0, 10);
+    }
+
+    var SEFK_SEVERITY_RANK = { green: 0, amber: 1, red: 2 };
+    var SEFK_SEVERITY_FILL = { red: '#DE350B', amber: '#FFAB00', green: '#00875A' };
+    var SEFK_SEVERITY_LABEL = { red: 'Alert', amber: 'Warning', green: 'On track' };
+
+    function worseSeverity(a, b) {
+        if (!a) return b;
+        if (!b) return a;
+        return SEFK_SEVERITY_RANK[a] >= SEFK_SEVERITY_RANK[b] ? a : b;
+    }
+
+    function appendAlertBadge(barEl, severity, tooltip) {
+        var bbox;
+        try {
+            bbox = barEl.getBBox();
+        } catch (_err) {
+            return;
+        }
+        var ns = 'http://www.w3.org/2000/svg';
+        var badge = document.createElementNS(ns, 'g');
+        badge.setAttribute('class', 'sefk-alert-badge sefk-alert-' + severity);
+        var circle = document.createElementNS(ns, 'circle');
+        circle.setAttribute('cx', (bbox.x - 6).toFixed(1));
+        circle.setAttribute('cy', (bbox.y + bbox.height / 2).toFixed(1));
+        circle.setAttribute('r', '4.4');
+        circle.setAttribute('fill', SEFK_SEVERITY_FILL[severity]);
+        circle.setAttribute('stroke', '#ffffff');
+        circle.setAttribute('stroke-width', '1');
+        var titleEl = document.createElementNS(ns, 'title');
+        titleEl.textContent = SEFK_SEVERITY_LABEL[severity] + ': ' + tooltip;
+        badge.appendChild(titleEl);
+        badge.appendChild(circle);
+        // Insert alongside (not inside) a pill clip wrapper, so the badge isn't clipped away too.
+        var anchor = barEl;
+        if (anchor.parentNode && anchor.parentNode.classList && anchor.parentNode.classList.contains('sefk-pill-clip-wrap')) {
+            anchor = anchor.parentNode;
+        }
+        anchor.parentNode.insertBefore(badge, anchor.nextSibling);
+    }
+
+    function computeSefkAlerts(svg) {
+        var statusMap = statusDtrainMap();
+        var doneStatuses = {};
+        var notStartedStatuses = {};
+        Object.keys(statusMap).forEach(function (status) {
+            if (statusMap[status] === 'Drive') doneStatuses[status] = true;
+            if (statusMap[status] === 'Dream') notStartedStatuses[status] = true;
+        });
+
+        var rows = parseRowInfo(svg);
+        var blockedBy = blockedByMap(svg);
+        var parents = dependencyParentMap();
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Each item's own severity/reason, independent of its children.
+        var ownSeverity = {};
+        var ownReason = {};
+        Object.keys(rows).forEach(function (key) {
+            var row = rows[key];
+            var severity = null;
+            var reason = '';
+
+            (blockedBy[key] || []).forEach(function (blockerKey) {
+                var blocker = rows[blockerKey];
+                if (blocker && row.start < blocker.end) {
+                    severity = 'red';
+                    reason = 'Starts ' + fmtDate(row.start) + ', before predecessor ' + blockerKey +
+                        ' ends ' + fmtDate(blocker.end) + '.';
+                }
+            });
+
+            if (!severity && !doneStatuses[row.status] && row.end < today) {
+                severity = 'red';
+                reason = 'Overdue: due ' + fmtDate(row.end) + ', status is "' + row.status + '".';
+            }
+
+            if (!severity && notStartedStatuses[row.status] && row.start < today) {
+                severity = 'amber';
+                reason = 'Not started: start date ' + fmtDate(row.start) + ' has passed.';
+            }
+
+            ownSeverity[key] = severity || 'green';
+            ownReason[key] = severity ? reason : '';
+        });
+
+        // Direct children, derived from the hierarchy parent map (only for keys we have data for).
+        var childrenOf = {};
+        Object.keys(rows).forEach(function (key) {
+            var parent = String(parents[key] || '').trim();
+            if (parent && rows[parent]) {
+                (childrenOf[parent] = childrenOf[parent] || []).push(key);
+            }
+        });
+
+        // Worst severity across each item and all of its descendants.
+        var aggregateSeverity = {};
+        Object.keys(rows).forEach(function (key) {
+            aggregateSeverity[key] = worseSeverity(aggregateSeverity[key], ownSeverity[key]);
+            var parent = String(parents[key] || '').trim();
+            while (parent && rows[parent]) {
+                aggregateSeverity[parent] = worseSeverity(aggregateSeverity[parent], ownSeverity[key]);
+                parent = String(parents[parent] || '').trim();
+            }
+        });
+
+        // Red/amber/green counts across all descendants (not including the item itself), for parent tooltips.
+        var descendantCountsMemo = {};
+        function descendantCounts(key) {
+            if (descendantCountsMemo[key]) return descendantCountsMemo[key];
+            var counts = { red: 0, amber: 0, green: 0 };
+            (childrenOf[key] || []).forEach(function (childKey) {
+                counts[ownSeverity[childKey]] += 1;
+                var childCounts = descendantCounts(childKey);
+                counts.red += childCounts.red;
+                counts.amber += childCounts.amber;
+                counts.green += childCounts.green;
+            });
+            descendantCountsMemo[key] = counts;
+            return counts;
+        }
+
+        Object.keys(rows).forEach(function (key) {
+            var counts = descendantCounts(key);
+            var totalChildren = counts.red + counts.amber + counts.green;
+            var ownIsAlert = ownSeverity[key] !== 'green';
+            var tooltip;
+            if (totalChildren) {
+                tooltip = (ownIsAlert ? ownReason[key] + ' ' : '') + 'Children: ' + counts.red + ' red, ' +
+                    counts.amber + ' amber, ' + counts.green + ' green (of ' + totalChildren + ').';
+            } else {
+                tooltip = ownReason[key] || 'No issues.';
+            }
+            appendAlertBadge(rows[key].bar, aggregateSeverity[key], tooltip);
+        });
+    }
+
     document.querySelectorAll('.chart-wrap-sefk svg').forEach(bindDependencyHover);
     document.querySelectorAll('.chart-wrap-sefk svg').forEach(refreshDependencyVisibility);
     document.querySelectorAll('.chart-wrap-sefk svg').forEach(refreshDependencyGeometry);
+    document.querySelectorAll('.chart-wrap-sefk svg').forEach(computeSefkAlerts);
 
   document.querySelectorAll('.chart-wrap-sefk').forEach(function (wrap) {
     wrap.addEventListener('wheel', function (evt) {
@@ -1766,6 +2174,15 @@ def sefk_dtrain_key_html() -> str:
         f"Items without scoped Story Points use a solid bar coloured by their Jira status "
         f"(mapped to D-Train phase above)."
         f"</div>"
+        '<div class="chart-key-row">'
+        '<span class="legend-swatch" style="background:#de350b;border-radius:50%"></span> '
+        "Alert: overdue and not completed, or starts before its predecessor finishes &nbsp; "
+        '<span class="legend-swatch" style="background:#ffab00;border-radius:50%"></span> '
+        "Warning: not started and its start date has passed &nbsp; "
+        '<span class="legend-swatch" style="background:#00875a;border-radius:50%"></span> '
+        "On track. Parents show the worst badge among their children; hover a parent to see the "
+        "breakdown."
+        "</div>"
         "</div>"
     )
 
@@ -1785,6 +2202,7 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
     ]
     row_positions: dict[str, tuple[float, float, float]] = {}
     parent_by_key: dict[str, str] = {}
+    pill_clip_ids = count(1)
 
     def _append_sefk_bar(
         parts_list: list[str],
@@ -1796,6 +2214,18 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
         bar_w: float,
         bar_h: float,
     ) -> None:
+        render_overlay = _sefk_render_scope_overlay(row) and not _is_milestone_row(row)
+        rx = max(4, int(bar_h / 2))
+        clip_id = ""
+        if render_overlay:
+            # Clip the striped D-Train segments to the bar's own pill outline so they
+            # don't poke out past the rounded ends as square corners.
+            clip_id = f"sefk-pill-clip-{next(pill_clip_ids)}"
+            parts_list.append(
+                f'<clipPath id="{clip_id}"><rect x="{x1:.1f}" y="{bar_y:.1f}" width="{bar_w:.1f}" '
+                f'height="{bar_h:.1f}" rx="{rx}"/></clipPath>'
+            )
+            parts_list.append(f'<g class="sefk-pill-clip-wrap" clip-path="url(#{clip_id})">')
         _append_timeline_bar(
             parts_list,
             row=row,
@@ -1806,13 +2236,16 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
             fill=_sefk_bar_fill(row, status_map=status_map),
             opacity=BAR_OPACITY,
             role=role,
+            rx=rx,
             scope_overlay_opacity=SCOPE_OVERLAY_OPACITY,
             blocked_by_keys=blocked_by.get(str(row.get("key") or ""), []),
             blocks_keys=blocks.get(str(row.get("key") or ""), []),
             rows_by_key=rows_by_key,
-            render_scope_overlay=_sefk_render_scope_overlay(row),
+            render_scope_overlay=render_overlay,
             render_dependency_icon=False,
         )
+        if render_overlay:
+            parts_list.append("</g>")
 
     x_min, x_max = resolve_chart_window_for_phases(phases)
     span_days = max((x_max - x_min).days, 1)
@@ -2105,10 +2538,12 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
                     epic_bar_w = max(ex2 - ex1, 2.0)
                     epic_bar_y = epic_bar_y_rel if (sub_phase_key and work_stream_key) else (block_y + ws_rel_y + epic_bar_y_rel)
                     if epic_key:
+                        level_zero_total_h = len(level_zero) * LEVEL_ZERO_ROW_HEIGHT
                         parts.append(
                             f'<g id="sefk-epic-{html.escape(epic_key)}" class="sefk-epic-row" '
                             f'data-epic-key="{html.escape(epic_key)}" transform="translate(0,0)" '
-                            f'data-level-zero-h="{len(level_zero) * LEVEL_ZERO_ROW_HEIGHT}">'
+                            f'data-level-zero-h="{level_zero_total_h}" '
+                            f'data-level-zero-base-h="{level_zero_total_h}">'
                         )
                     _append_sefk_bar(
                         parts,
@@ -2174,6 +2609,10 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
                         level_zero_x2 = x_for(level_zero_end)
                         level_zero_bar_w = max(level_zero_x2 - level_zero_x1, 2.0)
                         level_zero_bar_y = level_zero_bar_y_rel if (sub_phase_key and work_stream_key) else (block_y + ws_rel_y + level_zero_bar_y_rel)
+                        parts.append(
+                            f'<g class="sefk-level-zero-row" data-epic-key="{html.escape(epic_key)}" '
+                            f'data-level-zero-key="{html.escape(level_zero_key)}" transform="translate(0,0)">'
+                        )
                         _append_sefk_bar(
                             parts,
                             row=level_zero,
@@ -2208,6 +2647,7 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
                                 clip_path="sef-plan-label-col-x" if (sub_phase_key and work_stream_key) else "sef-plan-label-col",
                                 row_key=level_zero_key,
                             )
+                        parts.append("</g>")
 
                     if level_zero and epic_key:
                         parts.append("</g>")
@@ -2281,12 +2721,15 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
         )
 
     parent_map_str = json.dumps(parent_by_key).replace('"', "&quot;")
+    status_dtrain_str = json.dumps(status_map).replace('"', "&quot;")
     parts.append(
         f'<text id="sefk-cfg" data-block-pad-y="{BLOCK_PAD_Y}" '
         f'data-sub-phase-row-h="{SUB_PHASE_ROW_HEIGHT}" '
         f'data-work-stream-row-h="{WORK_STREAM_ROW_HEIGHT}" '
         f'data-epic-row-h="{EPIC_ROW_HEIGHT}" '
+        f'data-level-zero-row-h="{LEVEL_ZERO_ROW_HEIGHT}" '
         f'data-parent-map="{parent_map_str}" '
+        f'data-status-dtrain-map="{status_dtrain_str}" '
         f'visibility="hidden" fill="none">.</text>'
     )
 

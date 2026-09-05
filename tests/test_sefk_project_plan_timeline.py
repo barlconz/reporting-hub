@@ -106,11 +106,31 @@ class SefkProjectPlanTimelineTests(unittest.TestCase):
         self.assertIn('id="sefk-x-axis"', svg)
         self.assertIn('data-parent-map=', svg)
         self.assertIn('&quot;baseSubH&quot;', svg)
+        self.assertIn('data-level-zero-base-h=', svg)
+        self.assertIn('data-level-zero-row-h=', svg)
+        self.assertIn('data-status-dtrain-map=', svg)
 
     def test_svg_includes_work_stream_chevron_when_epics_present(self) -> None:
         svg = sefk_project_plan_timeline_svg(self.payload)
         self.assertIn('id="sefk-chev-ws-', svg)
         self.assertIn('id="sefk-sub-ws-', svg)
+
+    def test_svg_renders_level_zero_row_wrapper(self) -> None:
+        epic = self.payload["phases"][0]["subPhases"][0]["workStreams"][0]["epics"][0]
+        epic["levelZero"] = [
+            {
+                "key": "EPCE-9001",
+                "summary": "Draft profile schema",
+                "issueType": "Task",
+                "status": "Doing",
+                "startDate": epic["startDate"],
+                "endDate": epic["endDate"],
+            }
+        ]
+        svg = sefk_project_plan_timeline_svg(self.payload)
+        self.assertIn('class="sefk-level-zero-row"', svg)
+        self.assertIn('data-level-zero-key="EPCE-9001"', svg)
+        self.assertIn('data-epic-key="EPCE-8001"', svg)
 
     def test_svg_renders_issue_type_icons(self) -> None:
         self.payload["phases"][0]["issueTypeIconUrl"] = "https://twoa.atlassian.net/icon/phase.png"
