@@ -6,7 +6,7 @@ import html
 import json
 from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from artifact.atlassian import AtlassianAdapter
 from artifact.jira_binding import DTRAIN_PHASES, JiraBinding
@@ -168,16 +168,20 @@ def _merge_sorted_issue_keys(*key_lists: list[str]) -> list[str]:
     return sorted(merged)
 
 
+def _scope_segment_keys(rollup: dict[str, Any], segment_key: str) -> list[str]:
+    """Raw scoped issue keys for one D-Train phase or unpointed segment."""
+    if segment_key == _UNPOINTED_SEGMENT:
+        return [str(key) for key in rollup.get("unpointedIssueKeys") or [] if key]
+    return [
+        str(key)
+        for key in (rollup.get("phaseIssueKeys") or {}).get(segment_key) or []
+        if key
+    ]
+
+
 def milestone_scope_segment_jql(rollup: dict[str, Any], segment_key: str) -> str | None:
     """JQL opening scoped issues for one D-Train phase or unpointed segment."""
-    if segment_key == _UNPOINTED_SEGMENT:
-        keys = [str(key) for key in rollup.get("unpointedIssueKeys") or [] if key]
-    else:
-        keys = [
-            str(key)
-            for key in (rollup.get("phaseIssueKeys") or {}).get(segment_key) or []
-            if key
-        ]
+    keys = _scope_segment_keys(rollup, segment_key)
     if not keys:
         return None
     return f"key in ({', '.join(sorted(set(keys)))}) AND status != Rejected"
@@ -509,8 +513,16 @@ def append_scope_composition_overlay(
     bar_h: float,
     overlay_opacity: float = 0.92,
     link_class: str = "milestone-scope-segment",
+    kpmg_reference_by_key: dict[str, str] | None = None,
+    kpmg_search_url_builder: Callable[[str], str] | None = None,
 ) -> None:
-    """D-Train phase segments on a scope bar; each segment links to scoped Jira issues."""
+    """D-Train phase segments on a scope bar; each segment links to scoped Jira issues.
+
+    When ``kpmg_reference_by_key`` (scoped issue key -> KPMG source issue key) and
+    ``kpmg_search_url_builder`` are both provided, each segment splits into a link to the
+    referenced KPMG source issues and a link to the remaining un-referenced issues, instead
+    of a single combined link.
+    """
     cursor = x0
     for segment in segments:
         width = bar_w * segment["fraction"]
@@ -518,22 +530,54 @@ def append_scope_composition_overlay(
             continue
         fill = DTRAIN_PHASE_FILL.get(segment["key"], ATL["neutral"])
         seg_tip = scope_segment_tooltip(segment)
-        rect = (
-            f'<rect x="{cursor:.1f}" y="{y0:.1f}" width="{width:.1f}" height="{bar_h:.1f}" '
-            f'fill="{fill}" opacity="{overlay_opacity}" '
-            f'stroke="#ffffff" stroke-width="0.5"/>'
-        )
-        jql = milestone_scope_segment_jql(rollup, segment["key"])
         parts.append(f'<g>{_svg_embedded_title(seg_tip)}')
-        if jql:
-            url = html.escape(_jira_search_url(jql), quote=True)
+
+        sub_links: list[tuple[float, str]] = []
+        if kpmg_reference_by_key and kpmg_search_url_builder:
+            kpmg_keys: list[str] = []
+            plain_keys: list[str] = []
+            for key in _scope_segment_keys(rollup, segment["key"]):
+                kpmg_key = kpmg_reference_by_key.get(key)
+                if kpmg_key:
+                    kpmg_keys.append(kpmg_key)
+                else:
+                    plain_keys.append(key)
+            total = len(kpmg_keys) + len(plain_keys)
+            if total:
+                if kpmg_keys:
+                    jql = f"key in ({', '.join(sorted(set(kpmg_keys)))})"
+                    sub_links.append((len(kpmg_keys) / total, kpmg_search_url_builder(jql)))
+                if plain_keys:
+                    jql = f"key in ({', '.join(sorted(set(plain_keys)))}) AND status != Rejected"
+                    sub_links.append((len(plain_keys) / total, _jira_search_url(jql)))
+
+        if not sub_links:
+            jql = milestone_scope_segment_jql(rollup, segment["key"])
+            sub_links = [(1.0, _jira_search_url(jql))] if jql else []
+
+        if not sub_links:
             parts.append(
-                f'<a href="{url}" class="{html.escape(link_class)}" target="_blank" rel="noopener">'
+                f'<rect x="{cursor:.1f}" y="{y0:.1f}" width="{width:.1f}" height="{bar_h:.1f}" '
+                f'fill="{fill}" opacity="{overlay_opacity}" stroke="#ffffff" stroke-width="0.5"/>'
             )
-            parts.append(rect)
-            parts.append("</a>")
         else:
-            parts.append(rect)
+            sub_cursor = cursor
+            remaining = width
+            for index, (fraction, href) in enumerate(sub_links):
+                is_last = index == len(sub_links) - 1
+                sub_width = remaining if is_last else min(width * fraction, remaining)
+                rect = (
+                    f'<rect x="{sub_cursor:.1f}" y="{y0:.1f}" width="{sub_width:.1f}" height="{bar_h:.1f}" '
+                    f'fill="{fill}" opacity="{overlay_opacity}" stroke="#ffffff" stroke-width="0.5"/>'
+                )
+                parts.append(
+                    f'<a href="{html.escape(href, quote=True)}" class="{html.escape(link_class)}" '
+                    f'target="_blank" rel="noopener">'
+                )
+                parts.append(rect)
+                parts.append("</a>")
+                sub_cursor += sub_width
+                remaining -= sub_width
         parts.append("</g>")
         cursor += width
 

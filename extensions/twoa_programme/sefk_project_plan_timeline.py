@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from datetime import date
 from itertools import count
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
+from urllib.parse import quote
 
 if TYPE_CHECKING:
     from artifact.atlassian import AtlassianAdapter
@@ -80,6 +82,8 @@ from extensions.twoa_programme.sef_project_plan_timeline import (
     _label_with_duration_metrics,
     _parse_day,
     _truncate_label,
+    get_kpmg_reference_field_id,
+    set_kpmg_reference_field_id,
 )
 from extensions.twoa_programme.sefk_project_plan_reporting import (
     SefkProjectPlanReportingConfig,
@@ -108,6 +112,33 @@ SEFK_WORK_STREAM_LABEL_X = LABEL_PAD_X + 70
 SEFK_EPIC_LABEL_X = LABEL_PAD_X + 102
 SEFK_LEVEL_ZERO_LABEL_X = LABEL_PAD_X + 126
 RUN_ORDER_FIELD = "customfield_10541"
+KPMG_REFERENCE_FIELD_NAME = "KPMG Reference"
+KPMG_ATLASSIAN_SITE = "https://gate-pd232.atlassian.net"
+_KPMG_ISSUE_KEY_RE = re.compile(r"/browse/([A-Za-z][A-Za-z0-9]*-\d+)")
+
+
+def _kpmg_search_url(jql: str) -> str:
+    return f"{KPMG_ATLASSIAN_SITE}/issues/?jql={quote(jql, safe='')}"
+
+
+def _extract_kpmg_issue_key(url: str) -> str | None:
+    match = _KPMG_ISSUE_KEY_RE.search(url)
+    return match.group(1) if match else None
+
+
+def _sefk_issue_url(row: dict[str, Any], key: str) -> str:
+    kpmg_url = str(row.get("kpmgReferenceUrl") or "").strip()
+    if kpmg_url:
+        return html.escape(kpmg_url, quote=True)
+    return f"{JIRA_SERVER}/browse/{html.escape(key)}"
+
+
+def _resolve_kpmg_reference_field_id(adapter: "AtlassianAdapter") -> str | None:
+    try:
+        aliases = adapter._resolve_field_aliases()
+    except Exception:
+        return None
+    return aliases.get(KPMG_REFERENCE_FIELD_NAME) or None
 
 
 def _sefk_issue_type_icon_url(row: dict[str, Any]) -> str:
@@ -871,7 +902,9 @@ SEFK_COLLAPSE_SCRIPT = """
     refreshDependencyGeometry(svg);
   };
 
-    window.sefkCollapseAll = function () {
+    var sefkActiveFilter = null;
+
+    function collapseAllRaw() {
         document.querySelectorAll('[id^="sefk-sub-epic-"]').forEach(function (sub) {
             var epicKey = sub.id.replace('sefk-sub-epic-', '');
             if (!isHidden(sub)) window.sefkToggleEpic(null, epicKey);
@@ -884,9 +917,9 @@ SEFK_COLLAPSE_SCRIPT = """
             var spKey = sub.id.replace('sefk-sub-sp-', '');
             if (!isHidden(sub)) window.sefkToggleSubPhase(null, spKey);
         });
-    };
+    }
 
-    window.sefkExpandAll = function () {
+    function expandAllRaw() {
         document.querySelectorAll('[id^="sefk-sub-sp-"]').forEach(function (sub) {
             var spKey = sub.id.replace('sefk-sub-sp-', '');
             if (isHidden(sub)) window.sefkToggleSubPhase(null, spKey);
@@ -899,10 +932,28 @@ SEFK_COLLAPSE_SCRIPT = """
             var epicKey = sub.id.replace('sefk-sub-epic-', '');
             if (isHidden(sub)) window.sefkToggleEpic(null, epicKey);
         });
+    }
+
+    // Collapse All / Expand All / Phase / Workstream / Epic operate on the whole hierarchy
+    // and don't know about an active Milestones/Gates/Dependencies filter, so re-apply it
+    // afterward or the filter's hidden branches silently reappear (or vice versa).
+    function reapplyActiveSefkFilter() {
+        if (!sefkActiveFilter) return;
+        applySefkFilter(sefkActiveFilter.svg, sefkActiveFilter.kind);
+    }
+
+    window.sefkCollapseAll = function () {
+        collapseAllRaw();
+        reapplyActiveSefkFilter();
+    };
+
+    window.sefkExpandAll = function () {
+        expandAllRaw();
+        reapplyActiveSefkFilter();
     };
 
     function setHierarchyView(level, button) {
-        window.sefkCollapseAll();
+        collapseAllRaw();
         if (level === 'workstream' || level === 'epic') {
             document.querySelectorAll('[id^="sefk-sub-sp-"]').forEach(function (sub) {
                 var spKey = sub.id.replace('sefk-sub-sp-', '');
@@ -918,6 +969,7 @@ SEFK_COLLAPSE_SCRIPT = """
         document.querySelectorAll('.sefk-view-controls [data-hierarchy-level]').forEach(function (control) {
             control.classList.toggle('is-active', control === button);
         });
+        reapplyActiveSefkFilter();
     }
 
     window.sefkShowPhaseLevel = function (button) {
@@ -950,7 +1002,7 @@ SEFK_COLLAPSE_SCRIPT = """
         } catch (_err) {
             return;
         }
-        window.sefkCollapseAll();
+        collapseAllRaw();
         Object.keys(state).filter(function (id) { return state[id] && id.indexOf('sefk-sub-sp-') === 0; }).forEach(function (id) {
             window.sefkToggleSubPhase(null, id.replace('sefk-sub-sp-', ''));
         });
@@ -980,31 +1032,7 @@ SEFK_COLLAPSE_SCRIPT = """
         });
     }
 
-    window.sefkToggleFilter = function (kind, button) {
-        var active = button.classList.toggle('is-active');
-        var section = button.closest('.chart-section');
-        var svg = section ? section.querySelector('svg') : null;
-        if (!svg) return;
-
-        if (!active) {
-            resetAllLevelZeroRowFilters(svg);
-            resetEpicVisibilityFilter(svg);
-            resetWorkStreamVisibilityFilter(svg);
-            svg.querySelectorAll('[data-sef-key]').forEach(function (node) {
-                node.setAttribute('visibility', 'visible');
-                node.style.opacity = '';
-            });
-            svg.querySelectorAll('[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
-                node.setAttribute('visibility', 'visible');
-                node.style.opacity = '';
-            });
-            restoreHierarchyExpansionState(svg);
-            refreshDependencyVisibility(svg);
-            refreshDependencyGeometry(svg);
-            return;
-        }
-
-        svg.setAttribute('data-sefk-filter-expansion-state', JSON.stringify(hierarchyExpansionState(svg)));
+    function applySefkFilter(svg, kind) {
         resetAllLevelZeroRowFilters(svg);
         resetEpicVisibilityFilter(svg);
         resetWorkStreamVisibilityFilter(svg);
@@ -1021,7 +1049,7 @@ SEFK_COLLAPSE_SCRIPT = """
         var visibleKeys = withAntecedents(matchedKeys, blockedByMap(svg));
 
         // Collapse the whole hierarchy, then re-expand only the branches that lead to a visible item.
-        window.sefkCollapseAll();
+        collapseAllRaw();
         var parents = dependencyParentMap();
         Object.keys(visibleKeys).forEach(function (key) {
             expandHierarchyPath(svg, key, parents);
@@ -1049,6 +1077,36 @@ SEFK_COLLAPSE_SCRIPT = """
         applyWorkStreamVisibilityFilter(svg, visibleKeys);
         refreshDependencyVisibility(svg);
         refreshDependencyGeometry(svg);
+    }
+
+    window.sefkToggleFilter = function (kind, button) {
+        var active = button.classList.toggle('is-active');
+        var section = button.closest('.chart-section');
+        var svg = section ? section.querySelector('svg') : null;
+        if (!svg) return;
+
+        if (!active) {
+            sefkActiveFilter = null;
+            resetAllLevelZeroRowFilters(svg);
+            resetEpicVisibilityFilter(svg);
+            resetWorkStreamVisibilityFilter(svg);
+            svg.querySelectorAll('[data-sef-key]').forEach(function (node) {
+                node.setAttribute('visibility', 'visible');
+                node.style.opacity = '';
+            });
+            svg.querySelectorAll('[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+                node.setAttribute('visibility', 'visible');
+                node.style.opacity = '';
+            });
+            restoreHierarchyExpansionState(svg);
+            refreshDependencyVisibility(svg);
+            refreshDependencyGeometry(svg);
+            return;
+        }
+
+        svg.setAttribute('data-sefk-filter-expansion-state', JSON.stringify(hierarchyExpansionState(svg)));
+        sefkActiveFilter = { svg: svg, kind: kind };
+        applySefkFilter(svg, kind);
     };
 
     function setDependencyHighlight(svg, fromKey, toKey, active) {
@@ -1663,13 +1721,17 @@ def _attach_level_zero_rows(
     ]
     if not epics:
         return
+    child_fields = ["summary", "status", "issuetype", "created", "duedate", START_DATE_FIELD, "issuelinks", "parent", "labels"]
+    kpmg_reference_field_id = get_kpmg_reference_field_id()
+    if kpmg_reference_field_id and kpmg_reference_field_id not in child_fields:
+        child_fields.append(kpmg_reference_field_id)
     children = search_all(
         adapter,
         sefk_epic_scope_jql(
             parent_keys_csv=", ".join(str(epic["key"]) for epic in epics),
             scope_issue_types=config.scope_issue_types,
         ),
-        ["summary", "status", "issuetype", "created", "duedate", START_DATE_FIELD, "issuelinks", "parent", "labels"],
+        child_fields,
     )
     children_by_parent: dict[str, list[dict[str, Any]]] = {}
     for child in children:
@@ -2048,6 +2110,8 @@ def fetch_sefk_project_plan_timeline(
 ) -> dict[str, Any]:
     fallback_start = date.fromisoformat(config.chart_window_start)
     fallback_end = date.fromisoformat(config.chart_window_end)
+    kpmg_reference_field_id = _resolve_kpmg_reference_field_id(adapter)
+    set_kpmg_reference_field_id(kpmg_reference_field_id)
     fields = [
         "summary",
         "status",
@@ -2059,6 +2123,8 @@ def fetch_sefk_project_plan_timeline(
         "issuelinks",
         "parent",
     ]
+    if kpmg_reference_field_id:
+        fields.append(kpmg_reference_field_id)
     scope_fields = [*fields]
 
     scope_filter_jql = resolve_scope_filter_jql(adapter, config)
@@ -2195,6 +2261,11 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
     status_map = dict(payload.get("statusDtrain") or {})
     blocked_by, blocks = _build_sefk_block_link_maps(phases)
     rows_by_key = _sefk_rows_by_key(phases)
+    kpmg_reference_by_key: dict[str, str] = {}
+    for key, row in rows_by_key.items():
+        kpmg_key = _extract_kpmg_issue_key(str(row.get("kpmgReferenceUrl") or ""))
+        if kpmg_key:
+            kpmg_reference_by_key[key] = kpmg_key
     dependency_edges = [
         (blocker_key, blocked_key)
         for blocked_key, blocker_keys in blocked_by.items()
@@ -2243,6 +2314,8 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
             rows_by_key=rows_by_key,
             render_scope_overlay=render_overlay,
             render_dependency_icon=False,
+            kpmg_reference_by_key=kpmg_reference_by_key,
+            kpmg_search_url_builder=_kpmg_search_url,
         )
         if render_overlay:
             parts_list.append("</g>")
@@ -2348,7 +2421,7 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
                 text=_label_with_duration_metrics(phase_label, phase),
                 x=SEFK_PHASE_LABEL_X,
                 y_center=phase_row_cy,
-                url=f"{JIRA_SERVER}/browse/{html.escape(phase_key)}",
+                url=_sefk_issue_url(phase, phase_key),
                 tooltip=_bar_tooltip(phase),
                 font_size=13,
                 font_weight="700",
@@ -2412,7 +2485,7 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
                     text=_label_with_duration_metrics(sub_phase_label, sub_phase),
                     x=SEFK_SUB_PHASE_LABEL_X,
                     y_center=row_cy,
-                    url=f"{JIRA_SERVER}/browse/{html.escape(sub_phase_key)}",
+                    url=_sefk_issue_url(sub_phase, sub_phase_key),
                     tooltip=_bar_tooltip(sub_phase),
                     font_weight="600",
                     row_key=sub_phase_key,
@@ -2500,7 +2573,7 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
                         text=ws_label_text,
                         x=SEFK_WORK_STREAM_LABEL_X,
                         y_center=label_y,
-                        url=f"{JIRA_SERVER}/browse/{html.escape(work_stream_key)}",
+                        url=_sefk_issue_url(work_stream, work_stream_key),
                         tooltip=_bar_tooltip(work_stream),
                         font_size=11,
                         clip_path="sef-plan-label-col-x" if (sub_phase_key and work_stream_key) else "sef-plan-label-col",
@@ -2574,7 +2647,7 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
                             text=_sefk_truncate_label(epic_label, SEFK_EPIC_LABEL_MAX_CHARS),
                             x=SEFK_EPIC_LABEL_X,
                             y_center=epic_cy,
-                            url=f"{JIRA_SERVER}/browse/{html.escape(epic_key)}",
+                            url=_sefk_issue_url(epic, epic_key),
                             tooltip=_bar_tooltip(epic),
                             font_size=10,
                             clip_path="sef-plan-label-col-x" if (sub_phase_key and work_stream_key) else "sef-plan-label-col",
@@ -2641,7 +2714,7 @@ def sefk_project_plan_timeline_svg(payload: dict[str, Any]) -> str:
                                 text=_sefk_truncate_label(level_zero_label, SEFK_EPIC_LABEL_MAX_CHARS),
                                 x=SEFK_LEVEL_ZERO_LABEL_X,
                                 y_center=level_zero_cy,
-                                url=f"{JIRA_SERVER}/browse/{html.escape(level_zero_key)}",
+                                url=_sefk_issue_url(level_zero, level_zero_key),
                                 tooltip=_bar_tooltip(level_zero),
                                 font_size=9,
                                 clip_path="sef-plan-label-col-x" if (sub_phase_key and work_stream_key) else "sef-plan-label-col",

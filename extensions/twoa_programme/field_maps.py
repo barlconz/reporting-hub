@@ -17,6 +17,8 @@ def field_aliases() -> dict[str, str]:
         "Notes": "customfield_10475",
         "Story Points": "customfield_10026",
         "T-Shirt Size": "customfield_11234",
+        # KPMG (TWOA) sync-hub traceability — holds the source KPMG issue URL
+        "KPMG Reference": "customfield_15272",
         # Testlet fields
         "Test Description": TESTLET_FIELDS["test_description"],
         "Test Steps": TESTLET_FIELDS["test_steps"],

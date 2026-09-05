@@ -12,8 +12,10 @@ from extensions.twoa_programme.sefk_project_plan_timeline import (
     SEFK_PHASE_LABEL_X,
     _bubble_scope_rollups,
     _build_sefk_hierarchy_from_flat,
+    _extract_kpmg_issue_key,
     _merge_scope_rollups,
     _sefk_bar_fill,
+    _sefk_issue_url,
     _sefk_render_scope_overlay,
     _sefk_work_stream_display_label,
     _sort_sub_phase_sibling_keys,
@@ -131,6 +133,33 @@ class SefkProjectPlanTimelineTests(unittest.TestCase):
         self.assertIn('class="sefk-level-zero-row"', svg)
         self.assertIn('data-level-zero-key="EPCE-9001"', svg)
         self.assertIn('data-epic-key="EPCE-8001"', svg)
+
+    def test_extract_kpmg_issue_key(self) -> None:
+        self.assertEqual(
+            _extract_kpmg_issue_key("https://gate-pd232.atlassian.net/browse/TWOA-1234"),
+            "TWOA-1234",
+        )
+        self.assertIsNone(_extract_kpmg_issue_key(""))
+        self.assertIsNone(_extract_kpmg_issue_key("not a url"))
+
+    def test_sefk_issue_url_prefers_kpmg_reference(self) -> None:
+        row_with_reference = {"kpmgReferenceUrl": "https://gate-pd232.atlassian.net/browse/TWOA-1234"}
+        self.assertEqual(
+            _sefk_issue_url(row_with_reference, "SEFK-1"),
+            "https://gate-pd232.atlassian.net/browse/TWOA-1234",
+        )
+        row_without_reference: dict = {}
+        self.assertEqual(
+            _sefk_issue_url(row_without_reference, "SEFK-1"),
+            "https://twoa.atlassian.net/browse/SEFK-1",
+        )
+
+    def test_svg_label_link_redirects_to_kpmg_reference(self) -> None:
+        epic = self.payload["phases"][0]["subPhases"][0]["workStreams"][0]["epics"][0]
+        epic["kpmgReferenceUrl"] = "https://gate-pd232.atlassian.net/browse/TWOA-4242"
+        svg = sefk_project_plan_timeline_svg(self.payload)
+        self.assertIn('href="https://gate-pd232.atlassian.net/browse/TWOA-4242"', svg)
+        self.assertNotIn(f'href="https://twoa.atlassian.net/browse/{epic["key"]}"', svg)
 
     def test_svg_renders_issue_type_icons(self) -> None:
         self.payload["phases"][0]["issueTypeIconUrl"] = "https://twoa.atlassian.net/icon/phase.png"

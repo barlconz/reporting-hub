@@ -7,7 +7,7 @@ import itertools
 import json
 from datetime import date, timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 if TYPE_CHECKING:
     from artifact.atlassian import AtlassianAdapter
@@ -58,6 +58,20 @@ ENVIRONMENT_FIELD_ID = "customfield_10408"
 PLATFORMS_FIELD_ID = "customfield_10046"
 PLATFORM_FIELD_ID = "customfield_10079"
 TEST_TYPES_FIELD_ID = "customfield_10145"
+
+# Resolved lazily per-fetch (e.g. via Jira field alias lookup) since the customfield id
+# varies by site; set via set_kpmg_reference_field_id() before building timeline rows.
+_kpmg_reference_field_id: str | None = None
+
+
+def set_kpmg_reference_field_id(field_id: str | None) -> None:
+    global _kpmg_reference_field_id
+    _kpmg_reference_field_id = field_id or None
+
+
+def get_kpmg_reference_field_id() -> str | None:
+    return _kpmg_reference_field_id
+
 
 # Source-field names used in report filterDimensions and the Jira fields that feed them.
 _DIMENSION_SOURCE_FIELD_IDS: dict[str, tuple[str, ...]] = {
@@ -562,6 +576,10 @@ def _issue_timeline_row(
         row["issueType"] = issue_type
     if issue_type_icon_url:
         row["issueTypeIconUrl"] = issue_type_icon_url
+    if _kpmg_reference_field_id:
+        kpmg_reference_url = str(fields.get(_kpmg_reference_field_id) or "").strip()
+        if kpmg_reference_url.startswith("http"):
+            row["kpmgReferenceUrl"] = kpmg_reference_url
     if _is_milestone_issue_type(issue_type, milestone_issue_types):
         if "meeting gate" in issue_type.strip().lower():
             row["isMeetingGate"] = True
@@ -1511,6 +1529,8 @@ def _append_timeline_bar(
     rows_by_key: dict[str, dict[str, Any]] | None = None,
     render_scope_overlay: bool = True,
     render_dependency_icon: bool = True,
+    kpmg_reference_by_key: dict[str, str] | None = None,
+    kpmg_search_url_builder: Callable[[str], str] | None = None,
 ) -> None:
     row_key = str(row.get("key") or "").strip()
     focus_payload = _blocked_focus_payload(
@@ -1590,6 +1610,8 @@ def _append_timeline_bar(
                 bar_h=bar_h,
                 overlay_opacity=scope_overlay_opacity,
                 link_class="block-scope-segment",
+                kpmg_reference_by_key=kpmg_reference_by_key,
+                kpmg_search_url_builder=kpmg_search_url_builder,
             )
 
     if focus_payload and render_dependency_icon:
