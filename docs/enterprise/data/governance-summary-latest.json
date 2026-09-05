@@ -1,0 +1,190 @@
+{
+  "sources": {
+    "per_user_csv": "reports/github-billing/per-user-billing-estimates-2026-08-20.csv",
+    "org_usage": "reports/github-billing/data/org-usage-2026-08-20.json",
+    "copilot_seats": "reports/github-billing/data/copilot-seats-2026-08-20.json",
+    "org_budgets": "reports/github-billing/data/org-budgets-2026-08-20.json"
+  },
+  "currency": "NZD",
+  "usd_to_nzd_rate": 1.65,
+  "monthly": {
+    "month": "2026-08",
+    "net_total_usd": 150.81753786500002,
+    "net_total_nzd": 248.84893747725002
+  },
+  "groups": [
+    {
+      "group": "EPC",
+      "users": 6,
+      "seated_users": 3,
+      "estimated_gross_nzd": 56.331,
+      "cost_per_user_nzd": 18.777
+    },
+    {
+      "group": "TWoA",
+      "users": 6,
+      "seated_users": 4,
+      "estimated_gross_nzd": 75.108,
+      "cost_per_user_nzd": 18.777
+    }
+  ],
+  "grouped_users": [
+    {
+      "group": "EPC",
+      "login": "arlitwoa",
+      "name": "Brett Alley",
+      "has_copilot_seat": true,
+      "seated_since": "2025-08-27",
+      "last_used": "2026-08-20"
+    },
+    {
+      "group": "EPC",
+      "login": "delphym",
+      "name": "Daniel Mladek",
+      "has_copilot_seat": true,
+      "seated_since": "2025-11-14",
+      "last_used": "2026-08-20"
+    },
+    {
+      "group": "TWoA",
+      "login": "leninkuriakosetwoa",
+      "name": "Lenin Kuriakose",
+      "has_copilot_seat": true,
+      "seated_since": "2026-02-03",
+      "last_used": "2026-08-18"
+    },
+    {
+      "group": "EPC",
+      "login": "levinsonaruja",
+      "name": "Levinson Aruja",
+      "has_copilot_seat": true,
+      "seated_since": "2026-06-16",
+      "last_used": "2026-07-23"
+    },
+    {
+      "group": "TWoA",
+      "login": "RossTWOA",
+      "name": "Ross McDougall",
+      "has_copilot_seat": true,
+      "seated_since": "2026-07-03",
+      "last_used": "2026-08-19"
+    },
+    {
+      "group": "TWoA",
+      "login": "ChrisONeilltwoa",
+      "name": "Chris O'Neill",
+      "has_copilot_seat": true,
+      "seated_since": "2026-07-15",
+      "last_used": "2026-08-19"
+    },
+    {
+      "group": "TWoA",
+      "login": "mpgomes-twoa",
+      "name": "Marina Gomes",
+      "has_copilot_seat": true,
+      "seated_since": "2026-07-15",
+      "last_used": "2026-08-19"
+    },
+    {
+      "group": "EPC",
+      "login": "ajitmk",
+      "name": "Ajit Kuttikatte",
+      "has_copilot_seat": false,
+      "seated_since": null,
+      "last_used": null
+    },
+    {
+      "group": "EPC",
+      "login": "JMvD11885",
+      "name": "Jeanne-Marie van Dolleweerd",
+      "has_copilot_seat": false,
+      "seated_since": null,
+      "last_used": null
+    },
+    {
+      "group": "EPC",
+      "login": "matt-belcher-twoa",
+      "name": "Matt Belcher",
+      "has_copilot_seat": false,
+      "seated_since": null,
+      "last_used": null
+    },
+    {
+      "group": "TWoA",
+      "login": "ljc-nz",
+      "name": "Lisa Cruikshank",
+      "has_copilot_seat": false,
+      "seated_since": null,
+      "last_used": null
+    },
+    {
+      "group": "TWoA",
+      "login": "itpurchasingtwoa",
+      "name": "Service Account",
+      "has_copilot_seat": false,
+      "seated_since": null,
+      "last_used": null
+    }
+  ],
+  "billing": {
+    "rows": [
+      {
+        "sku": "actions",
+        "scope": "organization",
+        "budget_nzd": 0.0,
+        "prevent_further_usage": true,
+        "will_alert": true,
+        "recipients": [
+          "arlitwoa"
+        ]
+      },
+      {
+        "sku": "ai_credits",
+        "scope": "organization",
+        "budget_nzd": 330.0,
+        "prevent_further_usage": true,
+        "will_alert": true,
+        "recipients": [
+          "arlitwoa"
+        ]
+      },
+      {
+        "sku": "codespaces",
+        "scope": "organization",
+        "budget_nzd": 0.0,
+        "prevent_further_usage": true,
+        "will_alert": true,
+        "recipients": [
+          "arlitwoa"
+        ]
+      },
+      {
+        "sku": "git_lfs",
+        "scope": "organization",
+        "budget_nzd": 0.0,
+        "prevent_further_usage": true,
+        "will_alert": true,
+        "recipients": [
+          "arlitwoa"
+        ]
+      },
+      {
+        "sku": "packages",
+        "scope": "organization",
+        "budget_nzd": 0.0,
+        "prevent_further_usage": true,
+        "will_alert": true,
+        "recipients": [
+          "arlitwoa"
+        ]
+      }
+    ],
+    "alert_recipients": [
+      "arlitwoa"
+    ],
+    "org_enforced": true
+  },
+  "additions": [],
+  "removals": [],
+  "unmapped": []
+}

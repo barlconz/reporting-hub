@@ -1,0 +1,26 @@
+{
+  "notes": "Login-to-group mapping for GitHub Copilot governance summary. Keep this file current as team membership changes.",
+  "currency": {
+    "display": "NZD",
+    "usdToNzdRate": 1.65,
+    "note": "Static planning FX rate; adjust when finance advises a new rate."
+  },
+  "groups": {
+    "EPC": [
+      "ajitmk",
+      "arlitwoa",
+      "delphym",
+      "JMvD11885",
+      "levinsonaruja",
+      "matt-belcher-twoa"
+    ],
+    "TWoA": [
+      "ChrisONeilltwoa",
+      "itpurchasingtwoa",
+      "leninkuriakosetwoa",
+      "ljc-nz",
+      "mpgomes-twoa",
+      "RossTWOA"
+    ]
+  }
+}

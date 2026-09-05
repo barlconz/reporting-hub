@@ -61,8 +61,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     payload["inScopeFilterId"] = dm.in_scope_filter_id
     payload["inScopeFilterJql"] = filter_jql
-    payload["reportWindowStart"] = report_start.isoformat()
-    payload["reportWindowEnd"] = report_end.isoformat()
+    # Prefer filter/quarter fallbacks only when the timeline payload did not derive a window.
+    payload.setdefault("reportWindowStart", report_start.isoformat())
+    payload.setdefault("reportWindowEnd", report_end.isoformat())
 
     text = json.dumps(payload, indent=2)
     print(text)

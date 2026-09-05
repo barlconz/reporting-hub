@@ -79,7 +79,7 @@ class GitHubPagesPublishTests(unittest.TestCase):
         config = load_github_pages_site_config(root / "config" / "github-pages-site.json")
         self.assertEqual(config.site_title, "TWoA reporting hub")
         ids = [programme.id for programme in config.programmes]
-        self.assertEqual(ids, ["epc", "sef", "enterprise"])
+        self.assertEqual(ids, ["epc", "sef", "sefk", "enterprise"])
 
     def test_root_index_groups_by_programme(self):
         root = Path(__file__).resolve().parents[1]
@@ -110,7 +110,7 @@ class GitHubPagesPublishTests(unittest.TestCase):
         self.assertIn("Integrated project plan", html_doc)
         self.assertIn('aria-label="Breadcrumb"', html_doc)
 
-    def test_enterprise_hub_shows_empty_state(self):
+    def test_enterprise_hub_lists_governance_report(self):
         root = Path(__file__).resolve().parents[1]
         config = load_github_pages_site_config(root / "config" / "github-pages-site.json")
         enterprise = next(programme for programme in config.programmes if programme.id == "enterprise")
@@ -119,7 +119,8 @@ class GitHubPagesPublishTests(unittest.TestCase):
             site_title=config.site_title,
             generated_on="27 Jun 2026 12:00 NZST",
         )
-        self.assertIn("No published reports yet", html_doc)
+        self.assertIn("GitHub Copilot governance summary", html_doc)
+        self.assertIn('href="github-copilot-governance.html"', html_doc)
 
     def test_programme_hub_path(self):
         root = Path(__file__).resolve().parents[1]

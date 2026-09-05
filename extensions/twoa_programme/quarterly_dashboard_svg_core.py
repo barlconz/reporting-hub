@@ -96,24 +96,28 @@ def _svg_x_axis_labels(
     month_y = plot_bottom + 32
     for week_start in _week_start_dates(x_min, x_max):
         x = x_for(week_start)
+        week_tip = f"Week start: {week_start.strftime('%a %d %b %Y')}"
         parts.append(
             f'<line x1="{x:.1f}" y1="{plot_bottom}" x2="{x:.1f}" y2="{plot_bottom + 4:.1f}" '
             f'stroke="{ATL["line"]}" stroke-width="1"/>'
         )
         parts.append(
+            f'<g class="chart-x-week-label">{_svg_embedded_title(week_tip)}'
             f'<text x="{x:.1f}" y="{week_y:.1f}" text-anchor="middle" font-family="{SVG_FONT}" '
             f'font-size="{CHART_AXIS_FONT}" fill="{ATL["text_subtle"]}">'
-            f'{html.escape(week_start.strftime("%d"))}</text>'
+            f'{html.escape(week_start.strftime("%d"))}</text></g>'
         )
 
     month = date(x_min.year, x_min.month, 1)
     while month <= x_max:
         if month >= x_min:
             x = x_for(month)
+            month_tip = f"Month start: {month.strftime('%B %Y')}"
             parts.append(
+                f'<g class="chart-x-month-label">{_svg_embedded_title(month_tip)}'
                 f'<text x="{x:.0f}" y="{month_y:.1f}" text-anchor="middle" font-family="{SVG_FONT}" '
                 f'font-size="{CHART_AXIS_FONT}" fill="{ATL["text_subtle"]}" font-weight="600">'
-                f"{html.escape(month.strftime('%b'))}</text>"
+                f"{html.escape(month.strftime('%b'))}</text></g>"
             )
         if month.month == 12:
             month = date(month.year + 1, 1, 1)
@@ -129,19 +133,112 @@ def _svg_x_axis_labels(
         )
 
 
-def _svg_x_bottom_margin(*, include_title: bool = True, milestones: bool = False) -> int:
-    """Space below plot for x-axis labels and optional Date title."""
-    del milestones  # milestone letters use in-chart space only; no extra margin
-    base = 58 if include_title else 40
-    return max(PLOT_BOTTOM_MARGIN, base)
-
-
 MILESTONE_LINE_STROKE = 2.5
 MILESTONE_HIT_HALF_WIDTH = 8
 MILESTONE_LINE_CLASS = "chart-milestone-line"
 TODAY_LINE_STROKE = 2.5
 TODAY_LINE_CLASS = "chart-today-line"
 TODAY_LINE_COLOUR = "#000000"
+
+
+def _week_month_grid_line_specs(
+    *,
+    x_min: date,
+    x_max: date,
+    x_for,
+) -> list[dict[str, Any]]:
+    specs: list[dict[str, Any]] = []
+    for idx, week_start in enumerate(_week_start_dates(x_min, x_max)):
+        specs.append(
+            {
+                "kind": "week",
+                "idx": idx,
+                "x": round(float(x_for(week_start)), 1),
+                "tip": f"Week start: {week_start.strftime('%a %d %b %Y')}",
+            }
+        )
+
+    month_idx = 0
+    month = date(x_min.year, x_min.month, 1)
+    while month <= x_max:
+        if month >= x_min:
+            specs.append(
+                {
+                    "kind": "month",
+                    "idx": month_idx,
+                    "x": round(float(x_for(month)), 1),
+                    "tip": f"Month start: {month.strftime('%B %Y')}",
+                }
+            )
+            month_idx += 1
+        if month.month == 12:
+            month = date(month.year + 1, 1, 1)
+        else:
+            month = date(month.year, month.month + 1, 1)
+    return specs
+
+
+def _svg_week_month_grid_lines(
+    parts: list[str],
+    *,
+    specs: list[dict[str, Any]],
+    plot_top: float,
+    plot_bottom: float,
+    element_id_prefix: str = "sefk-grid",
+) -> None:
+    """Full-height week/month grid lines (visual; hover handled client-side)."""
+    parts.append('<g class="chart-week-month-grid" pointer-events="none">')
+    for spec in specs:
+        kind = str(spec["kind"])
+        idx = int(spec["idx"])
+        x = float(spec["x"])
+        line_id = f"{element_id_prefix}-{kind}-{idx}"
+        if kind == "week":
+            parts.append(
+                f'<line id="{line_id}" class="chart-week-grid-line" '
+                f'x1="{x:.1f}" y1="{plot_top:.1f}" x2="{x:.1f}" y2="{plot_bottom:.1f}" '
+                f'stroke="#cccccc" stroke-width="0.5" opacity="0.65"/>'
+            )
+        else:
+            parts.append(
+                f'<line id="{line_id}" class="chart-month-grid-line" '
+                f'x1="{x:.1f}" y1="{plot_top:.1f}" x2="{x:.1f}" y2="{plot_bottom:.1f}" '
+                f'stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/>'
+            )
+    parts.append("</g>")
+
+
+def _svg_week_month_grid_config_element(
+    parts: list[str],
+    *,
+    specs: list[dict[str, Any]],
+    plot_top: float,
+    plot_bottom: float,
+    plot_left: float,
+    plot_right: float,
+    element_id: str = "sefk-grid-lines",
+) -> None:
+    """Embed grid geometry for full-height hover tooltips (see SEFK chart script)."""
+    payload = {
+        "plotTop": round(plot_top, 1),
+        "plotBottom": round(plot_bottom, 1),
+        "plotLeft": round(plot_left, 1),
+        "plotRight": round(plot_right, 1),
+        "hitHalfWidth": MILESTONE_HIT_HALF_WIDTH,
+        "lines": specs,
+    }
+    raw = json.dumps(payload, separators=(",", ":")).replace('"', "&quot;")
+    parts.append(
+        f'<text id="{html.escape(element_id)}" data-grid="{raw}" '
+        f'visibility="hidden" fill="none">.</text>'
+    )
+
+
+def _svg_x_bottom_margin(*, include_title: bool = True, milestones: bool = False) -> int:
+    """Space below plot for x-axis labels and optional Date title."""
+    del milestones  # milestone letters use in-chart space only; no extra margin
+    base = 58 if include_title else 40
+    return max(PLOT_BOTTOM_MARGIN, base)
 
 
 def _load_delivery_milestones(artifacts_path: Path | None = None) -> list[dict[str, Any]]:

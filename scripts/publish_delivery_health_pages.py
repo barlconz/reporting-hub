@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import os
-import re
 import sys
 import tempfile
 from argparse import Namespace
@@ -25,8 +24,12 @@ from artifact.delivery_health.sprint_engine import run_sprint_health_reports  # 
 from extensions.twoa_programme.delivery_health import load_delivery_health_config  # noqa: E402
 from extensions.twoa_programme.delivery_health_pages import (  # noqa: E402
     DeliveryHealthPagesConfig,
+    build_no_active_sprint_html,
     build_sprint_health_landing_html,
+    ensure_dev_done_generated_timestamp,
+    ensure_epc_report_breadcrumb,
     load_delivery_health_pages_config,
+    reorder_dev_done_fix_version_section,
     resolve_in_cycle_fix_version,
 )
 from extensions.twoa_programme.github_pages_publish import write_pages_snapshot  # noqa: E402
@@ -73,22 +76,39 @@ def publish_snapshots(
     if not dev_done_only:
         with tempfile.TemporaryDirectory() as tmp:
             tmp_dir = Path(tmp)
-            sprint_args = Namespace(
-                sprint_name="",
-                active_sprint=True,
-                squad=None,
-                release_fix_version=release_fix_version,
-                output_dir=tmp_dir,
-                redact_names=False,
-            )
-            generated = run_sprint_health_reports(health_config, gateway, sprint_args)
-            for source in generated:
-                match = re.match(r"sprint_health_([^_]+)_", source.name)
-                if not match:
-                    raise SystemExit(f"Unexpected sprint health filename: {source.name}")
-                squad_slug = match.group(1)
+            for squad_slug, squad in sorted(health_config.squads.items()):
+                sprint_args = Namespace(
+                    sprint_name="",
+                    active_sprint=True,
+                    squad=[squad_slug],
+                    release_fix_version=release_fix_version,
+                    output_dir=tmp_dir,
+                    redact_names=False,
+                )
+                try:
+                    generated = run_sprint_health_reports(health_config, gateway, sprint_args)
+                except SystemExit as exc:
+                    message = str(exc)
+                    if "No active sprint for squad" not in message:
+                        raise
+                    generated = []
+
                 dest = pages.squad_publish_path(repo_root, squad_slug)
-                write_pages_snapshot(source.read_text(encoding="utf-8"), dest)
+                publish_path = f"sprint-health/{squad_slug}/index.html"
+                if generated:
+                    source = generated[0]
+                    html_doc = source.read_text(encoding="utf-8")
+                    html_doc = ensure_epc_report_breadcrumb(
+                        html_doc,
+                        publish_path=publish_path,
+                    )
+                else:
+                    html_doc = build_no_active_sprint_html(
+                        squad_label=squad.label,
+                        generated_on=generated_on,
+                        publish_path=publish_path,
+                    )
+                write_pages_snapshot(html_doc, dest)
                 written.append(dest)
 
             landing = build_sprint_health_landing_html(
@@ -113,7 +133,15 @@ def publish_snapshots(
             )
             source = run_dev_done_risk_report(health_config, gateway, dev_args)
             dest = pages.dev_done_publish_path(repo_root)
-            write_pages_snapshot(source.read_text(encoding="utf-8"), dest)
+            html_doc = source.read_text(encoding="utf-8")
+            html_doc = ensure_epc_report_breadcrumb(
+                html_doc,
+                publish_path=f"{pages.dev_done_risk.site_path}/{pages.dev_done_risk.index_file}",
+                report_title="EPCE Dev Done Risk",
+            )
+            html_doc = reorder_dev_done_fix_version_section(html_doc)
+            html_doc = ensure_dev_done_generated_timestamp(html_doc, generated_on=generated_on)
+            write_pages_snapshot(html_doc, dest)
             written.append(dest)
 
     return written

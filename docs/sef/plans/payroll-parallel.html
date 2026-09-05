@@ -24,7 +24,7 @@ body {
   margin: 0;
   background: var(--page-bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif;
 }
 body::before {
   content: "";
@@ -387,23 +387,187 @@ td.pending-metric a {
     padding: 16px 4px 24px;
 }
 .chart-wrap-sef-plan.chart-wrap-timeline {
-    max-height: none;
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    max-height: 82vh;
+    min-height: 400px;
+    overflow-x: scroll;
+    overflow-y: auto;
+    scrollbar-gutter: stable both-edges;
+    border: 1px solid #dfe1e6;
+    border-radius: 4px;
 }
-.chart-wrap-sef-plan svg {
+/* Override .report-shell .chart-wrap (overflow-x: hidden) */
+.report-shell .chart-wrap-sef-plan {
+    overflow-x: scroll;
+    overflow-y: auto;
+    scrollbar-gutter: stable both-edges;
+}
+/* Override .report-shell .chart-wrap svg (width:100%, max-width:100%, height:auto)
+   — SVG must render at its intrinsic pixel size so text is readable. */
+.report-shell .chart-wrap-sef-plan svg {
   display: block;
-  width: 100%;
+  width: auto;
   height: auto;
-  min-width: 0;
-  max-width: 100%;
+  min-width: unset;
+  max-width: unset;
+}
+.sef-plan-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 12px 0 4px;
+  font-size: 12px;
+  color: #42526e;
+}
+.sef-plan-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.sef-plan-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    margin: 8px 0 12px;
+    align-items: end;
+}
+.sef-plan-filter {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #42526e;
+}
+.sef-plan-expander {
+    min-width: 240px;
+    background: #fff;
+    border: 1px solid #dfe1e6;
+    border-radius: 6px;
+}
+.sef-plan-expander > summary {
+    list-style: none;
+    padding: 7px 10px;
+    cursor: pointer;
+    color: #172b4d;
+    font-weight: 500;
+    user-select: none;
+}
+.sef-plan-expander > summary::-webkit-details-marker {
+    display: none;
+}
+.sef-plan-expander > summary::after {
+    content: "▾";
+    float: right;
+    color: #6b778c;
+}
+.sef-plan-expander[open] > summary::after {
+    content: "▴";
+}
+.sef-plan-options {
+    max-height: 260px;
+    overflow: auto;
+    border-top: 1px solid #ebecf0;
+    padding: 6px 8px;
+}
+.sef-plan-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    color: #172b4d;
+}
+.sef-plan-option input {
+    margin: 0;
+}
+.sef-plan-option span {
+    line-height: 1.2;
+}
+.sef-plan-option:hover {
+    background: #f7f8fa;
+}
+.sef-plan-expander:focus-within {
+    border-color: #4c9aff;
+    box-shadow: 0 0 0 2px rgba(76, 154, 255, 0.2);
+}
+.sef-plan-filter-actions {
+    display: inline-flex;
+    align-items: flex-end;
+    padding-bottom: 1px;
+}
+.sef-plan-clear {
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #dfe1e6;
+    border-radius: 4px;
+    background: #fff;
+    color: #172b4d;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.sef-plan-clear:hover {
+    background: #f4f5f7;
+}
+.sef-plan-clear:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+.sef-plan-variant[hidden] {
+    display: none;
+}
+.sef-plan-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 1px solid rgba(9, 30, 66, 0.14);
+  flex: 0 0 14px;
 }
 .chart-wrap-sef-plan svg a text {
   text-decoration: none;
 }
 .chart-wrap-sef-plan svg a:hover text {
   text-decoration: underline;
+}
+.chart-wrap-sef-plan .sef-block-link-icon {
+    cursor: pointer;
+    user-select: none;
+}
+.chart-wrap-sef-plan .sef-block-link-icon-bg {
+    fill: #ffebe6;
+    stroke: #ff8f73;
+    stroke-width: 0.8;
+}
+.chart-wrap-sef-plan .sef-block-link-icon-glyph {
+    fill: #bf2600;
+    font-weight: 700;
+}
+.chart-wrap-sef-plan .sef-block-link-icon-dir {
+    fill: #42526e;
+    font-weight: 700;
+}
+.chart-wrap-sef-plan .sef-block-link-icon:hover .sef-block-link-icon-bg {
+    fill: #ffdfd6;
+    stroke: #de350b;
+}
+.chart-wrap-sef-plan .sef-block-link-icon.active .sef-block-link-icon-bg {
+    fill: #ffbdad;
+    stroke: #bf2600;
+}
+.chart-wrap-sef-plan .sef-block-link-icon[data-sef-dir="blocks"] .sef-block-link-icon-bg {
+    fill: #e3fcef;
+    stroke: #79f2c0;
+}
+.chart-wrap-sef-plan .sef-block-link-icon[data-sef-dir="blocks"] .sef-block-link-icon-glyph,
+.chart-wrap-sef-plan .sef-block-link-icon[data-sef-dir="blocks"] .sef-block-link-icon-dir {
+    fill: #006644;
+}
+.chart-wrap-sef-plan .sef-block-link-icon[data-sef-dir="both"] .sef-block-link-icon-bg {
+    fill: #deebff;
+    stroke: #4c9aff;
+}
+.chart-wrap-sef-plan .sef-block-link-icon[data-sef-dir="both"] .sef-block-link-icon-glyph,
+.chart-wrap-sef-plan .sef-block-link-icon[data-sef-dir="both"] .sef-block-link-icon-dir {
+    fill: #0747a6;
 }
 .sef-phase-divider {
   fill: #f4f5f7;
@@ -415,14 +579,885 @@ td.pending-metric a {
     <nav class="report-nav" aria-label="Breadcrumb"><a href="../../index.html">TWoA reporting hub</a> <span class="sep">›</span> <a href="../index.html">SEF</a> <span class="sep">›</span> <span class="current">SEF | Test Plan | Payroll Parallel | Block Schedule</span></nav>
     <header class="report-header">
       <h1>SEF | Test Plan | Payroll Parallel | Block Schedule</h1>
-      <p class="report-subtitle">Generated 24 Jul 2026 12:02 NZST</p>
+      <p class="report-subtitle">Generated 04 Sep 2026 19:52 NZST</p>
     </header>
     <section class="chart-section">
-      <div class="chart-wrap chart-wrap-timeline chart-wrap-sef-plan"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="286" viewBox="0 0 1700.0 286" preserveAspectRatio="xMinYMin meet" role="img" aria-label="SEF integrated project plan timeline"><rect x="0" y="0" width="1700.0" height="286" fill="#ffffff"/><defs><clipPath id="sef-plan-label-col"><rect x="0" y="120" width="272.0" height="94"/></clipPath><marker id="dep-arrow" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 8 4 L 0 8 z" fill="#de350b"/></marker></defs><line x1="280.0" y1="120" x2="280.0" y2="214" stroke="#dfe1e6" stroke-width="1"/><line x1="280.0" y1="214" x2="1496.0" y2="214" stroke="#dfe1e6" stroke-width="1"/><line x1="280.0" y1="120" x2="280.0" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="346.3" y1="120" x2="346.3" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="414.9" y1="120" x2="414.9" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="483.4" y1="120" x2="483.4" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="549.7" y1="120" x2="549.7" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="618.3" y1="120" x2="618.3" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="684.6" y1="120" x2="684.6" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="753.1" y1="120" x2="753.1" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="821.7" y1="120" x2="821.7" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="883.6" y1="120" x2="883.6" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="952.1" y1="120" x2="952.1" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1018.4" y1="120" x2="1018.4" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1087.0" y1="120" x2="1087.0" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1153.3" y1="120" x2="1153.3" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1221.8" y1="120" x2="1221.8" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1290.4" y1="120" x2="1290.4" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1356.7" y1="120" x2="1356.7" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1425.3" y1="120" x2="1425.3" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1491.6" y1="120" x2="1491.6" y2="214" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="280.0" y1="214" x2="280.0" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="280.0" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text><line x1="295.5" y1="214" x2="295.5" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="295.5" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text><line x1="311.0" y1="214" x2="311.0" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="311.0" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text><line x1="326.4" y1="214" x2="326.4" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="326.4" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text><line x1="341.9" y1="214" x2="341.9" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="341.9" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text><line x1="357.4" y1="214" x2="357.4" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="357.4" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">06</text><line x1="372.9" y1="214" x2="372.9" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="372.9" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">13</text><line x1="388.3" y1="214" x2="388.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="388.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">20</text><line x1="403.8" y1="214" x2="403.8" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="403.8" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">27</text><line x1="419.3" y1="214" x2="419.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="419.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">03</text><line x1="434.8" y1="214" x2="434.8" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="434.8" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">10</text><line x1="450.2" y1="214" x2="450.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="450.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">17</text><line x1="465.7" y1="214" x2="465.7" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="465.7" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">24</text><line x1="481.2" y1="214" x2="481.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="481.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">31</text><line x1="496.7" y1="214" x2="496.7" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="496.7" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text><line x1="512.1" y1="214" x2="512.1" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="512.1" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text><line x1="527.6" y1="214" x2="527.6" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="527.6" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text><line x1="543.1" y1="214" x2="543.1" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="543.1" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text><line x1="558.6" y1="214" x2="558.6" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="558.6" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text><line x1="574.1" y1="214" x2="574.1" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="574.1" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text><line x1="589.5" y1="214" x2="589.5" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="589.5" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text><line x1="605.0" y1="214" x2="605.0" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="605.0" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text><line x1="620.5" y1="214" x2="620.5" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="620.5" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">02</text><line x1="636.0" y1="214" x2="636.0" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="636.0" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">09</text><line x1="651.4" y1="214" x2="651.4" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="651.4" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">16</text><line x1="666.9" y1="214" x2="666.9" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="666.9" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">23</text><line x1="682.4" y1="214" x2="682.4" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="682.4" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">30</text><line x1="697.9" y1="214" x2="697.9" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="697.9" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text><line x1="713.3" y1="214" x2="713.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="713.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text><line x1="728.8" y1="214" x2="728.8" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="728.8" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text><line x1="744.3" y1="214" x2="744.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="744.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text><line x1="759.8" y1="214" x2="759.8" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="759.8" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">04</text><line x1="775.2" y1="214" x2="775.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="775.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">11</text><line x1="790.7" y1="214" x2="790.7" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="790.7" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">18</text><line x1="806.2" y1="214" x2="806.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="806.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">25</text><line x1="821.7" y1="214" x2="821.7" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="821.7" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text><line x1="837.1" y1="214" x2="837.1" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="837.1" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text><line x1="852.6" y1="214" x2="852.6" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="852.6" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text><line x1="868.1" y1="214" x2="868.1" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="868.1" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text><line x1="883.6" y1="214" x2="883.6" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="883.6" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text><line x1="899.1" y1="214" x2="899.1" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="899.1" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text><line x1="914.5" y1="214" x2="914.5" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="914.5" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text><line x1="930.0" y1="214" x2="930.0" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="930.0" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text><line x1="945.5" y1="214" x2="945.5" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="945.5" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text><line x1="961.0" y1="214" x2="961.0" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="961.0" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text><line x1="976.4" y1="214" x2="976.4" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="976.4" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text><line x1="991.9" y1="214" x2="991.9" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="991.9" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text><line x1="1007.4" y1="214" x2="1007.4" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1007.4" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text><line x1="1022.9" y1="214" x2="1022.9" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1022.9" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">03</text><line x1="1038.3" y1="214" x2="1038.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1038.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">10</text><line x1="1053.8" y1="214" x2="1053.8" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1053.8" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">17</text><line x1="1069.3" y1="214" x2="1069.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1069.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">24</text><line x1="1084.8" y1="214" x2="1084.8" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1084.8" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">31</text><line x1="1100.2" y1="214" x2="1100.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1100.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text><line x1="1115.7" y1="214" x2="1115.7" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1115.7" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text><line x1="1131.2" y1="214" x2="1131.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1131.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text><line x1="1146.7" y1="214" x2="1146.7" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1146.7" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text><line x1="1162.2" y1="214" x2="1162.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1162.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text><line x1="1177.6" y1="214" x2="1177.6" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1177.6" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text><line x1="1193.1" y1="214" x2="1193.1" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1193.1" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text><line x1="1208.6" y1="214" x2="1208.6" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1208.6" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text><line x1="1224.1" y1="214" x2="1224.1" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1224.1" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">02</text><line x1="1239.5" y1="214" x2="1239.5" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1239.5" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">09</text><line x1="1255.0" y1="214" x2="1255.0" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1255.0" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">16</text><line x1="1270.5" y1="214" x2="1270.5" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1270.5" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">23</text><line x1="1286.0" y1="214" x2="1286.0" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1286.0" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">30</text><line x1="1301.4" y1="214" x2="1301.4" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1301.4" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">06</text><line x1="1316.9" y1="214" x2="1316.9" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1316.9" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">13</text><line x1="1332.4" y1="214" x2="1332.4" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1332.4" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">20</text><line x1="1347.9" y1="214" x2="1347.9" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1347.9" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">27</text><line x1="1363.3" y1="214" x2="1363.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1363.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">04</text><line x1="1378.8" y1="214" x2="1378.8" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1378.8" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">11</text><line x1="1394.3" y1="214" x2="1394.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1394.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">18</text><line x1="1409.8" y1="214" x2="1409.8" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1409.8" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">25</text><line x1="1425.3" y1="214" x2="1425.3" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1425.3" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text><line x1="1440.7" y1="214" x2="1440.7" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1440.7" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text><line x1="1456.2" y1="214" x2="1456.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1456.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text><line x1="1471.7" y1="214" x2="1471.7" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1471.7" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text><line x1="1487.2" y1="214" x2="1487.2" y2="218.0" stroke="#dfe1e6" stroke-width="1"/><text x="1487.2" y="230.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text><text x="280" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jun</text><text x="346" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jul</text><text x="415" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Aug</text><text x="483" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Sep</text><text x="550" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Oct</text><text x="618" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Nov</text><text x="685" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Dec</text><text x="753" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jan</text><text x="822" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Feb</text><text x="884" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Mar</text><text x="952" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Apr</text><text x="1018" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">May</text><text x="1087" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jun</text><text x="1153" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jul</text><text x="1222" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Aug</text><text x="1290" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Sep</text><text x="1357" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Oct</text><text x="1425" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Nov</text><text x="1492" y="246.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Dec</text><text x="888" y="262.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Date</text><rect x="0" y="120.0" width="1496.0" height="62.0" fill="none" stroke="#172b4d" stroke-width="0.75"/><g clip-path="url(#sef-plan-label-col)"><title>: 
-Timeline: 2026-06-01 to 2027-12-03</title><text x="8.0" y="142.0" text-anchor="start" dominant-baseline="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#172b4d" font-weight="600"></text></g><rect x="0" y="156.0" width="1496.0" height="18.0" fill="#e8f4fd" opacity="0.55"/><g><title>: Other schedule blocks
-Timeline: 2026-06-01 to 2027-12-03</title><rect x="280.0" y="158.0" width="1216.0" height="14.0" rx="1" fill="#0052cc" opacity="0.55"/></g><g clip-path="url(#sef-plan-label-col)"><title>: Other schedule blocks
-Timeline: 2026-06-01 to 2027-12-03</title><a href="https://twoa.atlassian.net/browse/" target="_blank" rel="noopener"><text x="20.0" y="165.0" text-anchor="start" dominant-baseline="middle" font-family="-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif" font-size="9" fill="#5e6c84" font-weight="400">Other schedule blocks</text></a></g><g class="chart-today-marker"><title>Today: 2026-07-24 (Pacific/Auckland)</title><rect x="389.2" y="120.0" width="16.0" height="94.0" fill="transparent" pointer-events="all"/><line class="chart-today-line" x1="397.2" y1="120.0" x2="397.2" y2="214.0" stroke="#000000" stroke-width="2.5" opacity="0.95"/></g></svg></div>
+      <div class="sef-plan-legend"><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#7A869A"></span>All other work items</span><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#4C9AFF"></span>All</span><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#998DD9"></span>Change</span><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#0052CC"></span>Data</span><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#FF8B66"></span>HCM</span><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#79F2C0"></span>Integration</span><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#DE350B"></span>Milestone</span><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#FFE380"></span>Payroll</span><span class="sef-plan-legend-item"><span class="sef-plan-legend-swatch" style="background:#00875A"></span>Testing</span></div>
+            <div class="sef-plan-filters" aria-label="Report filters"><div class="sef-plan-filter"><span>Workstream</span><details class="sef-plan-expander" data-sef-filter="workstream"><summary data-sef-filter-summary>All</summary><div class="sef-plan-options"></div></details></div><div class="sef-plan-filter-actions"><button type="button" class="sef-plan-clear" data-sef-filter-clear>Clear all filters</button></div></div>
+                        <section class="sef-plan-variant" data-variant-key="__all__"><div class="chart-wrap chart-wrap-timeline chart-wrap-sef-plan"><svg xmlns="http://www.w3.org/2000/svg" width="4932" height="324" viewBox="0 0 4932.0 324" preserveAspectRatio="xMinYMin meet" role="img" aria-label="SEF integrated project plan timeline"><rect x="0" y="0" width="4932.0" height="324" fill="#ffffff"/><defs><clipPath id="sef-plan-label-col"><rect x="0" y="128" width="292.0" height="124"/></clipPath><marker id="dep-arrow" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 8 4 L 0 8 z" fill="#de350b"/></marker></defs><line x1="300.0" y1="128" x2="300.0" y2="252" stroke="#dfe1e6" stroke-width="1"/><g id="sef-x-axis-top"><line x1="300.0" y1="128" x2="4700.0" y2="128" stroke="#dfe1e6" stroke-width="1"/><line x1="300.0" y1="128" x2="300.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="300.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text><line x1="356.0" y1="128" x2="356.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="356.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text><line x1="412.0" y1="128" x2="412.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="412.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text><line x1="468.0" y1="128" x2="468.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="468.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text><line x1="524.0" y1="128" x2="524.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="524.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text><line x1="580.0" y1="128" x2="580.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="580.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">06</text><line x1="636.0" y1="128" x2="636.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="636.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">13</text><line x1="692.0" y1="128" x2="692.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="692.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">20</text><line x1="748.0" y1="128" x2="748.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="748.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">27</text><line x1="804.0" y1="128" x2="804.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="804.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">03</text><line x1="860.0" y1="128" x2="860.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="860.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">10</text><line x1="916.0" y1="128" x2="916.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="916.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">17</text><line x1="972.0" y1="128" x2="972.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="972.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">24</text><line x1="1028.0" y1="128" x2="1028.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1028.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">31</text><line x1="1084.0" y1="128" x2="1084.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1084.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text><line x1="1140.0" y1="128" x2="1140.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1140.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text><line x1="1196.0" y1="128" x2="1196.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1196.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text><line x1="1252.0" y1="128" x2="1252.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1252.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text><line x1="1308.0" y1="128" x2="1308.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1308.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text><line x1="1364.0" y1="128" x2="1364.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1364.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text><line x1="1420.0" y1="128" x2="1420.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1420.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text><line x1="1476.0" y1="128" x2="1476.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1476.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text><line x1="1532.0" y1="128" x2="1532.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1532.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">02</text><line x1="1588.0" y1="128" x2="1588.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1588.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">09</text><line x1="1644.0" y1="128" x2="1644.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1644.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">16</text><line x1="1700.0" y1="128" x2="1700.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1700.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">23</text><line x1="1756.0" y1="128" x2="1756.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1756.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">30</text><line x1="1812.0" y1="128" x2="1812.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1812.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text><line x1="1868.0" y1="128" x2="1868.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1868.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text><line x1="1924.0" y1="128" x2="1924.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1924.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text><line x1="1980.0" y1="128" x2="1980.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="1980.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text><line x1="2036.0" y1="128" x2="2036.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2036.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">04</text><line x1="2092.0" y1="128" x2="2092.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2092.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">11</text><line x1="2148.0" y1="128" x2="2148.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2148.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">18</text><line x1="2204.0" y1="128" x2="2204.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2204.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">25</text><line x1="2260.0" y1="128" x2="2260.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2260.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text><line x1="2316.0" y1="128" x2="2316.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2316.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text><line x1="2372.0" y1="128" x2="2372.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2372.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text><line x1="2428.0" y1="128" x2="2428.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2428.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text><line x1="2484.0" y1="128" x2="2484.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2484.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text><line x1="2540.0" y1="128" x2="2540.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2540.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text><line x1="2596.0" y1="128" x2="2596.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2596.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text><line x1="2652.0" y1="128" x2="2652.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2652.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text><line x1="2708.0" y1="128" x2="2708.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2708.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text><line x1="2764.0" y1="128" x2="2764.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2764.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text><line x1="2820.0" y1="128" x2="2820.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2820.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text><line x1="2876.0" y1="128" x2="2876.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2876.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text><line x1="2932.0" y1="128" x2="2932.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2932.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text><line x1="2988.0" y1="128" x2="2988.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="2988.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">03</text><line x1="3044.0" y1="128" x2="3044.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3044.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">10</text><line x1="3100.0" y1="128" x2="3100.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3100.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">17</text><line x1="3156.0" y1="128" x2="3156.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3156.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">24</text><line x1="3212.0" y1="128" x2="3212.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3212.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">31</text><line x1="3268.0" y1="128" x2="3268.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3268.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text><line x1="3324.0" y1="128" x2="3324.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3324.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text><line x1="3380.0" y1="128" x2="3380.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3380.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text><line x1="3436.0" y1="128" x2="3436.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3436.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text><line x1="3492.0" y1="128" x2="3492.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3492.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text><line x1="3548.0" y1="128" x2="3548.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3548.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text><line x1="3604.0" y1="128" x2="3604.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3604.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text><line x1="3660.0" y1="128" x2="3660.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3660.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text><line x1="3716.0" y1="128" x2="3716.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3716.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">02</text><line x1="3772.0" y1="128" x2="3772.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3772.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">09</text><line x1="3828.0" y1="128" x2="3828.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3828.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">16</text><line x1="3884.0" y1="128" x2="3884.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3884.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">23</text><line x1="3940.0" y1="128" x2="3940.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3940.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">30</text><line x1="3996.0" y1="128" x2="3996.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="3996.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">06</text><line x1="4052.0" y1="128" x2="4052.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4052.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">13</text><line x1="4108.0" y1="128" x2="4108.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4108.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">20</text><line x1="4164.0" y1="128" x2="4164.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4164.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">27</text><line x1="4220.0" y1="128" x2="4220.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4220.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">04</text><line x1="4276.0" y1="128" x2="4276.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4276.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">11</text><line x1="4332.0" y1="128" x2="4332.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4332.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">18</text><line x1="4388.0" y1="128" x2="4388.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4388.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">25</text><line x1="4444.0" y1="128" x2="4444.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4444.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text><line x1="4500.0" y1="128" x2="4500.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4500.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text><line x1="4556.0" y1="128" x2="4556.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4556.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text><line x1="4612.0" y1="128" x2="4612.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4612.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text><line x1="4668.0" y1="128" x2="4668.0" y2="124.0" stroke="#dfe1e6" stroke-width="1"/><text x="4668.0" y="120.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text><text x="300" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jun</text><text x="540" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jul</text><text x="788" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Aug</text><text x="1036" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Sep</text><text x="1276" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Oct</text><text x="1524" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Nov</text><text x="1764" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Dec</text><text x="2012" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jan</text><text x="2260" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Feb</text><text x="2484" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Mar</text><text x="2732" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Apr</text><text x="2972" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">May</text><text x="3220" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jun</text><text x="3460" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jul</text><text x="3708" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Aug</text><text x="3956" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Sep</text><text x="4196" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Oct</text><text x="4444" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Nov</text><text x="4684" y="104.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Dec</text></g><g id="sef-x-axis" data-sef-orig-bottom="252.0"><line x1="300.0" y1="252" x2="4700.0" y2="252" stroke="#dfe1e6" stroke-width="1"/><line x1="300.0" y1="128" x2="300.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="540.0" y1="128" x2="540.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="788.0" y1="128" x2="788.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1036.0" y1="128" x2="1036.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1276.0" y1="128" x2="1276.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1524.0" y1="128" x2="1524.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="1764.0" y1="128" x2="1764.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="2012.0" y1="128" x2="2012.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="2260.0" y1="128" x2="2260.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="2484.0" y1="128" x2="2484.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="2732.0" y1="128" x2="2732.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="2972.0" y1="128" x2="2972.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="3220.0" y1="128" x2="3220.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="3460.0" y1="128" x2="3460.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="3708.0" y1="128" x2="3708.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="3956.0" y1="128" x2="3956.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="4196.0" y1="128" x2="4196.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="4444.0" y1="128" x2="4444.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="4684.0" y1="128" x2="4684.0" y2="252" stroke="#555555" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.5"/><line x1="300.0" y1="252" x2="300.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 01 Jun 2026</title><text x="300.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text></g><line x1="356.0" y1="252" x2="356.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 08 Jun 2026</title><text x="356.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text></g><line x1="412.0" y1="252" x2="412.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 15 Jun 2026</title><text x="412.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text></g><line x1="468.0" y1="252" x2="468.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 22 Jun 2026</title><text x="468.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text></g><line x1="524.0" y1="252" x2="524.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 29 Jun 2026</title><text x="524.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text></g><line x1="580.0" y1="252" x2="580.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 06 Jul 2026</title><text x="580.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">06</text></g><line x1="636.0" y1="252" x2="636.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 13 Jul 2026</title><text x="636.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">13</text></g><line x1="692.0" y1="252" x2="692.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 20 Jul 2026</title><text x="692.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">20</text></g><line x1="748.0" y1="252" x2="748.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 27 Jul 2026</title><text x="748.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">27</text></g><line x1="804.0" y1="252" x2="804.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 03 Aug 2026</title><text x="804.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">03</text></g><line x1="860.0" y1="252" x2="860.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 10 Aug 2026</title><text x="860.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">10</text></g><line x1="916.0" y1="252" x2="916.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 17 Aug 2026</title><text x="916.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">17</text></g><line x1="972.0" y1="252" x2="972.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 24 Aug 2026</title><text x="972.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">24</text></g><line x1="1028.0" y1="252" x2="1028.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 31 Aug 2026</title><text x="1028.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">31</text></g><line x1="1084.0" y1="252" x2="1084.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 07 Sep 2026</title><text x="1084.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text></g><line x1="1140.0" y1="252" x2="1140.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 14 Sep 2026</title><text x="1140.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text></g><line x1="1196.0" y1="252" x2="1196.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 21 Sep 2026</title><text x="1196.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text></g><line x1="1252.0" y1="252" x2="1252.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 28 Sep 2026</title><text x="1252.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text></g><line x1="1308.0" y1="252" x2="1308.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 05 Oct 2026</title><text x="1308.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text></g><line x1="1364.0" y1="252" x2="1364.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 12 Oct 2026</title><text x="1364.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text></g><line x1="1420.0" y1="252" x2="1420.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 19 Oct 2026</title><text x="1420.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text></g><line x1="1476.0" y1="252" x2="1476.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 26 Oct 2026</title><text x="1476.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text></g><line x1="1532.0" y1="252" x2="1532.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 02 Nov 2026</title><text x="1532.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">02</text></g><line x1="1588.0" y1="252" x2="1588.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 09 Nov 2026</title><text x="1588.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">09</text></g><line x1="1644.0" y1="252" x2="1644.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 16 Nov 2026</title><text x="1644.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">16</text></g><line x1="1700.0" y1="252" x2="1700.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 23 Nov 2026</title><text x="1700.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">23</text></g><line x1="1756.0" y1="252" x2="1756.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 30 Nov 2026</title><text x="1756.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">30</text></g><line x1="1812.0" y1="252" x2="1812.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 07 Dec 2026</title><text x="1812.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text></g><line x1="1868.0" y1="252" x2="1868.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 14 Dec 2026</title><text x="1868.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text></g><line x1="1924.0" y1="252" x2="1924.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 21 Dec 2026</title><text x="1924.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text></g><line x1="1980.0" y1="252" x2="1980.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 28 Dec 2026</title><text x="1980.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text></g><line x1="2036.0" y1="252" x2="2036.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 04 Jan 2027</title><text x="2036.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">04</text></g><line x1="2092.0" y1="252" x2="2092.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 11 Jan 2027</title><text x="2092.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">11</text></g><line x1="2148.0" y1="252" x2="2148.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 18 Jan 2027</title><text x="2148.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">18</text></g><line x1="2204.0" y1="252" x2="2204.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 25 Jan 2027</title><text x="2204.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">25</text></g><line x1="2260.0" y1="252" x2="2260.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 01 Feb 2027</title><text x="2260.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text></g><line x1="2316.0" y1="252" x2="2316.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 08 Feb 2027</title><text x="2316.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text></g><line x1="2372.0" y1="252" x2="2372.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 15 Feb 2027</title><text x="2372.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text></g><line x1="2428.0" y1="252" x2="2428.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 22 Feb 2027</title><text x="2428.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text></g><line x1="2484.0" y1="252" x2="2484.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 01 Mar 2027</title><text x="2484.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text></g><line x1="2540.0" y1="252" x2="2540.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 08 Mar 2027</title><text x="2540.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text></g><line x1="2596.0" y1="252" x2="2596.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 15 Mar 2027</title><text x="2596.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text></g><line x1="2652.0" y1="252" x2="2652.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 22 Mar 2027</title><text x="2652.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text></g><line x1="2708.0" y1="252" x2="2708.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 29 Mar 2027</title><text x="2708.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text></g><line x1="2764.0" y1="252" x2="2764.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 05 Apr 2027</title><text x="2764.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text></g><line x1="2820.0" y1="252" x2="2820.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 12 Apr 2027</title><text x="2820.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text></g><line x1="2876.0" y1="252" x2="2876.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 19 Apr 2027</title><text x="2876.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text></g><line x1="2932.0" y1="252" x2="2932.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 26 Apr 2027</title><text x="2932.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text></g><line x1="2988.0" y1="252" x2="2988.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 03 May 2027</title><text x="2988.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">03</text></g><line x1="3044.0" y1="252" x2="3044.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 10 May 2027</title><text x="3044.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">10</text></g><line x1="3100.0" y1="252" x2="3100.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 17 May 2027</title><text x="3100.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">17</text></g><line x1="3156.0" y1="252" x2="3156.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 24 May 2027</title><text x="3156.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">24</text></g><line x1="3212.0" y1="252" x2="3212.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 31 May 2027</title><text x="3212.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">31</text></g><line x1="3268.0" y1="252" x2="3268.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 07 Jun 2027</title><text x="3268.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">07</text></g><line x1="3324.0" y1="252" x2="3324.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 14 Jun 2027</title><text x="3324.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">14</text></g><line x1="3380.0" y1="252" x2="3380.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 21 Jun 2027</title><text x="3380.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">21</text></g><line x1="3436.0" y1="252" x2="3436.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 28 Jun 2027</title><text x="3436.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">28</text></g><line x1="3492.0" y1="252" x2="3492.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 05 Jul 2027</title><text x="3492.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">05</text></g><line x1="3548.0" y1="252" x2="3548.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 12 Jul 2027</title><text x="3548.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">12</text></g><line x1="3604.0" y1="252" x2="3604.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 19 Jul 2027</title><text x="3604.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">19</text></g><line x1="3660.0" y1="252" x2="3660.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 26 Jul 2027</title><text x="3660.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">26</text></g><line x1="3716.0" y1="252" x2="3716.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 02 Aug 2027</title><text x="3716.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">02</text></g><line x1="3772.0" y1="252" x2="3772.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 09 Aug 2027</title><text x="3772.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">09</text></g><line x1="3828.0" y1="252" x2="3828.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 16 Aug 2027</title><text x="3828.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">16</text></g><line x1="3884.0" y1="252" x2="3884.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 23 Aug 2027</title><text x="3884.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">23</text></g><line x1="3940.0" y1="252" x2="3940.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 30 Aug 2027</title><text x="3940.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">30</text></g><line x1="3996.0" y1="252" x2="3996.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 06 Sep 2027</title><text x="3996.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">06</text></g><line x1="4052.0" y1="252" x2="4052.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 13 Sep 2027</title><text x="4052.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">13</text></g><line x1="4108.0" y1="252" x2="4108.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 20 Sep 2027</title><text x="4108.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">20</text></g><line x1="4164.0" y1="252" x2="4164.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 27 Sep 2027</title><text x="4164.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">27</text></g><line x1="4220.0" y1="252" x2="4220.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 04 Oct 2027</title><text x="4220.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">04</text></g><line x1="4276.0" y1="252" x2="4276.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 11 Oct 2027</title><text x="4276.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">11</text></g><line x1="4332.0" y1="252" x2="4332.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 18 Oct 2027</title><text x="4332.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">18</text></g><line x1="4388.0" y1="252" x2="4388.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 25 Oct 2027</title><text x="4388.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">25</text></g><line x1="4444.0" y1="252" x2="4444.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 01 Nov 2027</title><text x="4444.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">01</text></g><line x1="4500.0" y1="252" x2="4500.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 08 Nov 2027</title><text x="4500.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">08</text></g><line x1="4556.0" y1="252" x2="4556.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 15 Nov 2027</title><text x="4556.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">15</text></g><line x1="4612.0" y1="252" x2="4612.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 22 Nov 2027</title><text x="4612.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">22</text></g><line x1="4668.0" y1="252" x2="4668.0" y2="256.0" stroke="#dfe1e6" stroke-width="1"/><g class="chart-x-week-label"><title>Week start: Mon 29 Nov 2027</title><text x="4668.0" y="268.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84">29</text></g><g class="chart-x-month-label"><title>Month start: June 2026</title><text x="300" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jun</text></g><g class="chart-x-month-label"><title>Month start: July 2026</title><text x="540" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jul</text></g><g class="chart-x-month-label"><title>Month start: August 2026</title><text x="788" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Aug</text></g><g class="chart-x-month-label"><title>Month start: September 2026</title><text x="1036" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Sep</text></g><g class="chart-x-month-label"><title>Month start: October 2026</title><text x="1276" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Oct</text></g><g class="chart-x-month-label"><title>Month start: November 2026</title><text x="1524" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Nov</text></g><g class="chart-x-month-label"><title>Month start: December 2026</title><text x="1764" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Dec</text></g><g class="chart-x-month-label"><title>Month start: January 2027</title><text x="2012" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jan</text></g><g class="chart-x-month-label"><title>Month start: February 2027</title><text x="2260" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Feb</text></g><g class="chart-x-month-label"><title>Month start: March 2027</title><text x="2484" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Mar</text></g><g class="chart-x-month-label"><title>Month start: April 2027</title><text x="2732" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Apr</text></g><g class="chart-x-month-label"><title>Month start: May 2027</title><text x="2972" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">May</text></g><g class="chart-x-month-label"><title>Month start: June 2027</title><text x="3220" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jun</text></g><g class="chart-x-month-label"><title>Month start: July 2027</title><text x="3460" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Jul</text></g><g class="chart-x-month-label"><title>Month start: August 2027</title><text x="3708" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Aug</text></g><g class="chart-x-month-label"><title>Month start: September 2027</title><text x="3956" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Sep</text></g><g class="chart-x-month-label"><title>Month start: October 2027</title><text x="4196" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Oct</text></g><g class="chart-x-month-label"><title>Month start: November 2027</title><text x="4444" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Nov</text></g><g class="chart-x-month-label"><title>Month start: December 2027</title><text x="4684" y="284.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Dec</text></g><text x="2500" y="300.0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="600">Date</text></g><rect x="340.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="396.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="452.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="508.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="564.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="620.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="676.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="732.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="788.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="844.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="900.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="956.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1012.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1068.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1124.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1180.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1236.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1292.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1348.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1404.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1460.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1516.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1572.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1628.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1684.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1740.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1796.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1852.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1908.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="1964.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2020.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2076.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2132.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2188.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2244.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2300.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2356.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2412.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2468.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2524.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2580.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2636.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2692.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2748.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2804.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2860.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2916.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="2972.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3028.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3084.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3140.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3196.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3252.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3308.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3364.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3420.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3476.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3532.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3588.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3644.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3700.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3756.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3812.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3868.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3924.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="3980.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4036.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4092.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4148.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4204.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4260.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4316.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4372.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4428.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4484.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4540.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4596.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="4652.0" y="128" width="16.0" height="124.0" fill="#d4d4d4" opacity="0.45"/><rect x="0" y="128.0" width="4700.0" height="80.0" data-sef-key="" data-sef-row="1" data-sef-role="chapter-border" data-sef-orig-y="128.0" data-sef-orig-height="80.0" fill="none" stroke="#172b4d" stroke-width="0.75"/><g clip-path="url(#sef-plan-label-col)"><title>: 
+Timeline: 2026-06-01 to 2027-12-03</title><text x="10.0" y="156.0" text-anchor="start" dominant-baseline="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#172b4d" font-weight="600">(ED 551 | WD 395 | W 78.7)</text></g><rect x="0" y="174.0" width="4700.0" data-sef-key="" data-sef-row="1" data-sef-role="package-lane" data-sef-orig-y="174.0" data-sef-orig-height="24.0" height="24.0" fill="#e8f4fd" opacity="0.55"/><g data-sef-role="package-bar" data-sef-issue-type=""><title>: Other schedule blocks
+Timeline: 2026-06-01 to 2027-12-03</title><rect x="300.0" y="176.0" width="4400.0" height="20.0" rx="1" fill="#7A869A" opacity="0.85"/></g><g clip-path="url(#sef-plan-label-col)"><title>: Other schedule blocks
+Timeline: 2026-06-01 to 2027-12-03</title><a href="https://twoa.atlassian.net/browse/" target="_blank" rel="noopener"><text x="20.0" y="186.0" text-anchor="start" dominant-baseline="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif" font-size="10" fill="#5e6c84" font-weight="400">Other schedule blocks (ED 551 | WD 395 | W 78.7)</text></a></g></g><g class="chart-today-marker"><title>Today: 2026-09-04 (Pacific/Auckland)</title><rect x="1052.0" y="128.0" width="16.0" height="124.0" fill="transparent" pointer-events="all"/><line class="chart-today-line" x1="1060.0" y1="128.0" x2="1060.0" y2="252.0" stroke="#000000" stroke-width="2.5" opacity="0.95"/></g></svg></div><p class="footnote">1 schedule chapters, 1 stream packages from PDE Block work items (2026-06-01 to 2027-12-03). Each bar runs from start date through due date. Milestones are shown as meeting-gate icons or red triangles. Bar colours follow Jira Plans Workstream mapping.</p></section>
     </section>
   </main>
+    
+<script>
+(() => {
+const dimensionMeta = [{"id": "workstream", "sourceField": "workstreams"}];
+const rowFilterValues = {};
+const filters = document.querySelectorAll('[data-sef-filter]');
+const clearBtn = document.querySelector('[data-sef-filter-clear]');
+const svg = document.querySelector('.sef-plan-variant .chart-wrap-sef-plan svg');
+
+function selectedValues(filterEl) {
+    return Array.from(filterEl.querySelectorAll('input[data-sef-filter-option]:checked'))
+        .map((opt) => String(opt.value || '').trim())
+        .filter(Boolean);
+}
+
+function updateSummary(filterEl) {
+    const summary = filterEl.querySelector('[data-sef-filter-summary]');
+    if (!summary) return;
+    const selected = selectedValues(filterEl);
+    if (!selected.length) {
+        summary.textContent = 'All';
+        return;
+    }
+    if (selected.length === 1) {
+        const only = filterEl.querySelector('input[data-sef-filter-option]:checked + span');
+        summary.textContent = only ? only.textContent : '1 selected';
+        return;
+    }
+    summary.textContent = `${selected.length} selected`;
+}
+
+function closeAllExpanders(exceptEl) {
+    filters.forEach((f) => {
+        if (exceptEl && f === exceptEl) return;
+        if (f.open) f.open = false;
+    });
+}
+
+function parentMapFromSvg() {
+    if (!svg) return {};
+    const pm = svg.querySelector('#sef-pm');
+    if (!pm) return {};
+    try {
+        return JSON.parse((pm.getAttribute('data-parent-map') || '{}').replace(/&quot;/g, '"'));
+    } catch (_err) {
+        return {};
+    }
+}
+
+function buildChildrenMap(parentMap) {
+    const children = {};
+    Object.keys(parentMap).forEach((key) => {
+        const parent = String(parentMap[key] || '').trim();
+        if (!parent) return;
+        if (!children[parent]) children[parent] = [];
+        children[parent].push(key);
+    });
+    return children;
+}
+
+function addAncestors(set, key, parentMap) {
+    let cur = String(key || '').trim();
+    let guard = 0;
+    while (cur && guard < 128) {
+        const parent = String(parentMap[cur] || '').trim();
+        if (!parent) break;
+        set.add(parent);
+        cur = parent;
+        guard += 1;
+    }
+}
+
+function addDescendants(set, key, childrenMap) {
+    const stack = [String(key || '').trim()].filter(Boolean);
+    let guard = 0;
+    while (stack.length && guard < 5000) {
+        const cur = stack.pop();
+        const kids = childrenMap[cur] || [];
+        for (const child of kids) {
+            if (!set.has(child)) {
+                set.add(child);
+                stack.push(child);
+            }
+        }
+        guard += 1;
+    }
+}
+
+function rowMatchesSelections(rowValues, selectedByDim) {
+    for (const dim of dimensionMeta) {
+        const selected = selectedByDim[dim.id] || [];
+        if (!selected.length) continue;
+        const rowVals = rowValues[dim.id] || [];
+        if (!rowVals.length) return false;
+        const hit = selected.some((v) => rowVals.includes(v));
+        if (!hit) return false;
+    }
+    return true;
+}
+
+function effectiveRowValues(key, dimId, parentMap, cache) {
+    const cacheKey = `${key}::${dimId}`;
+    if (cache[cacheKey]) return cache[cacheKey];
+
+    const values = [];
+    const seen = new Set();
+    let cur = String(key || '').trim();
+    let guard = 0;
+    while (cur && guard < 128) {
+        const curValues = (rowFilterValues[cur] && rowFilterValues[cur][dimId]) || [];
+        curValues.forEach((v) => {
+            if (!seen.has(v)) {
+                seen.add(v);
+                values.push(v);
+            }
+        });
+        cur = String(parentMap[cur] || '').trim();
+        guard += 1;
+    }
+
+    cache[cacheKey] = values;
+    return values;
+}
+
+function rowMatchesSelectionsForKey(key, selectedByDim, parentMap, cache) {
+    for (const dim of dimensionMeta) {
+        const selected = selectedByDim[dim.id] || [];
+        if (!selected.length) continue;
+        const vals = effectiveRowValues(key, dim.id, parentMap, cache);
+        if (!vals.length) return false;
+        const hit = selected.some((v) => vals.includes(v));
+        if (!hit) return false;
+    }
+    return true;
+}
+
+function apply() {
+    if (!svg) return;
+
+    const selectedByDim = {};
+    let activeCount = 0;
+    dimensionMeta.forEach((dim) => {
+        const sel = document.querySelector(`[data-sef-filter="${dim.id}"]`);
+        const vals = sel ? selectedValues(sel) : [];
+        selectedByDim[dim.id] = vals;
+        activeCount += vals.length;
+    });
+
+    const allMode = activeCount === 0;
+    const parentMap = parentMapFromSvg();
+    const childrenMap = buildChildrenMap(parentMap);
+    const visibleKeys = new Set();
+    const inheritedValueCache = {};
+
+    if (allMode) {
+        Object.keys(rowFilterValues).forEach((key) => visibleKeys.add(key));
+    } else {
+        const matched = new Set();
+        Object.keys(rowFilterValues).forEach((key) => {
+            if (rowMatchesSelectionsForKey(key, selectedByDim, parentMap, inheritedValueCache)) matched.add(key);
+        });
+
+        matched.forEach((key) => {
+            visibleKeys.add(key);
+            addAncestors(visibleKeys, key, parentMap);
+            addDescendants(visibleKeys, key, childrenMap);
+        });
+    }
+
+    svg.querySelectorAll('[data-sef-key]').forEach((node) => {
+        const key = String(node.getAttribute('data-sef-key') || '').trim();
+        if (!key) return;
+        node.style.display = visibleKeys.has(key) ? '' : 'none';
+    });
+
+    svg.querySelectorAll('[data-sef-dep-from][data-sef-dep-to]').forEach((node) => {
+        const from = String(node.getAttribute('data-sef-dep-from') || '').trim();
+        const to = String(node.getAttribute('data-sef-dep-to') || '').trim();
+        node.style.display = (visibleKeys.has(from) && visibleKeys.has(to)) ? '' : 'none';
+    });
+
+    svg.removeAttribute('data-sef-focus-source');
+    svg.querySelectorAll('.sef-block-link-icon.active').forEach((node) => node.classList.remove('active'));
+    if (clearBtn) clearBtn.disabled = allMode;
+    if (typeof window.sefApplyVisibilityCompaction === 'function') {
+        window.sefApplyVisibilityCompaction(svg);
+    }
+}
+
+filters.forEach((sel) => {
+    updateSummary(sel);
+    sel.addEventListener('toggle', () => {
+        if (sel.open) closeAllExpanders(sel);
+    });
+    sel.addEventListener('change', (event) => {
+        updateSummary(sel);
+        apply();
+        const target = event.target;
+        if (target instanceof Element && target.matches('input[data-sef-filter-option]')) {
+            closeAllExpanders(null);
+        }
+    });
+});
+
+document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const withinFilter = target.closest('details.sef-plan-expander');
+    if (!withinFilter) closeAllExpanders(null);
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeAllExpanders(null);
+});
+
+if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+        filters.forEach((sel) => {
+            Array.from(sel.querySelectorAll('input[data-sef-filter-option]')).forEach((opt) => {
+                opt.checked = false;
+            });
+            updateSummary(sel);
+        });
+        apply();
+    });
+}
+apply();
+})();
+</script>
+
+<script>
+(function () {
+  'use strict';
+    var chartPans = document.querySelectorAll('.chart-wrap-sef-plan');
+    chartPans.forEach(function (wrap) {
+        wrap.addEventListener('wheel', function (evt) {
+            var canScrollX = wrap.scrollWidth > wrap.clientWidth;
+            if (!canScrollX) return;
+
+            var canScrollY = wrap.scrollHeight > wrap.clientHeight;
+            var atTop = wrap.scrollTop <= 0;
+            var atBottom = (wrap.scrollTop + wrap.clientHeight) >= (wrap.scrollHeight - 1);
+
+            var xDelta = evt.deltaX;
+            var yDelta = evt.deltaY;
+            var useHorizontal = evt.shiftKey || Math.abs(xDelta) > Math.abs(yDelta);
+
+            // If the user hits the vertical edge of the timeline viewport,
+            // continue panning horizontally with the wheel instead of no-op.
+            if (!useHorizontal && canScrollY) {
+                if ((yDelta < 0 && atTop) || (yDelta > 0 && atBottom)) {
+                    useHorizontal = true;
+                }
+            }
+
+            // If there is no vertical scrollbar, treat wheel motion as horizontal pan.
+            if (!useHorizontal && !canScrollY && Math.abs(yDelta) > 0.01) {
+                useHorizontal = true;
+            }
+
+            if (!useHorizontal) return;
+
+            var delta = xDelta;
+            if (Math.abs(delta) < 0.01) delta = yDelta;
+            if (Math.abs(delta) < 0.01) return;
+
+            wrap.scrollLeft += delta;
+            evt.preventDefault();
+        }, { passive: false });
+    });
+
+    function ensureOriginalSvgState(svg) {
+        if (!svg.getAttribute('data-sef-orig-viewbox')) {
+            svg.setAttribute('data-sef-orig-viewbox', svg.getAttribute('viewBox') || '');
+        }
+        if (!svg.getAttribute('data-sef-orig-height')) {
+            svg.setAttribute('data-sef-orig-height', svg.getAttribute('height') || '');
+        }
+        var wrap = svg.closest('.chart-wrap-sef-plan');
+        if (wrap) {
+            if (!wrap.getAttribute('data-sef-orig-min-height')) {
+                wrap.setAttribute('data-sef-orig-min-height', wrap.style.minHeight || '');
+            }
+            if (!wrap.getAttribute('data-sef-orig-height')) {
+                wrap.setAttribute('data-sef-orig-height', wrap.style.height || '');
+            }
+        }
+    }
+
+    function restoreOriginalSvgState(svg) {
+        var vb = svg.getAttribute('data-sef-orig-viewbox');
+        var h = svg.getAttribute('data-sef-orig-height');
+        if (vb) svg.setAttribute('viewBox', vb);
+        if (h) svg.setAttribute('height', h);
+
+        var wrap = svg.closest('.chart-wrap-sef-plan');
+        if (wrap) {
+            wrap.style.minHeight = wrap.getAttribute('data-sef-orig-min-height') || '';
+            wrap.style.height = wrap.getAttribute('data-sef-orig-height') || '';
+        }
+    }
+
+    function _extractTranslate(transform) {
+        var t = String(transform || '').trim();
+        if (!t) return { x: 0, y: 0 };
+        var m = t.match(/translate\(([^)]+)\)/i);
+        if (!m) return { x: 0, y: 0 };
+        var vals = m[1].split(/[ ,]+/).filter(Boolean).map(parseFloat);
+        if (!vals.length || vals.some(function (n) { return !isFinite(n); })) return { x: 0, y: 0 };
+        return { x: vals[0] || 0, y: vals.length > 1 ? (vals[1] || 0) : 0 };
+    }
+
+    function _effectiveBox(node) {
+        var box;
+        try {
+            var clip = String(node.getAttribute && node.getAttribute('clip-path') || '');
+            if (clip.indexOf('sef-plan-label-col') !== -1) {
+                var txt = node.querySelector('text');
+                box = txt ? txt.getBBox() : node.getBBox();
+            } else {
+                box = node.getBBox();
+            }
+        } catch (_err) { return null; }
+        if (!box || !isFinite(box.x) || !isFinite(box.y) || !isFinite(box.width) || !isFinite(box.height)) {
+            return null;
+        }
+        var tx = 0;
+        var ty = 0;
+        var cur = node;
+        while (cur && cur.getAttribute) {
+            var tr = _extractTranslate(cur.getAttribute('transform'));
+            tx += tr.x;
+            ty += tr.y;
+            cur = cur.parentNode;
+            if (cur && cur.tagName && String(cur.tagName).toLowerCase() === 'svg') break;
+        }
+        return { x: box.x + tx, y: box.y + ty, width: box.width, height: box.height };
+    }
+
+    function _isReasonableRowBox(node, box) {
+        if (!box) return false;
+        if (!isFinite(box.height) || box.height <= 0) return false;
+        var isRow = (node.getAttribute && node.getAttribute('data-sef-row') === '1');
+        if (!isRow) return true;
+        var role = (node.getAttribute('data-sef-role') || '').trim();
+        if (role === 'chapter-border' || role === 'package-lane') return false;
+        // Row-level items should be short; very tall boxes are wrapper artefacts.
+        return box.height <= 160;
+    }
+
+    function _isShown(node, stopAt) {
+        var cur = node;
+        while (cur && cur !== stopAt) {
+            if (cur.style && cur.style.display === 'none') return false;
+            cur = cur.parentNode;
+        }
+        return true;
+    }
+
+    function _hasAncestorWithSameKey(node, key, stopAt) {
+        var cur = node ? node.parentNode : null;
+        while (cur && cur !== stopAt) {
+            if (cur.getAttribute) {
+                var curKey = (cur.getAttribute('data-sef-key') || '').trim();
+                var isRow = cur.getAttribute('data-sef-row') === '1';
+                if (isRow && curKey === key) return true;
+            }
+            cur = cur.parentNode;
+        }
+        return false;
+    }
+
+    function _isInLabelClipRegion(node, stopAt) {
+        var cur = node;
+        while (cur && cur !== stopAt) {
+            if (cur.getAttribute) {
+                var clip = String(cur.getAttribute('clip-path') || '');
+                if (clip.indexOf('sef-plan-label-col') !== -1) return true;
+            }
+            cur = cur.parentNode;
+        }
+        return false;
+    }
+
+    function repositionFocusedXAxis(svg, newY, newH, xShift, clampToViewport) {
+        var axis = svg.querySelector('#sef-x-axis');
+        if (!axis) return;
+        var origBottom = parseFloat(axis.getAttribute('data-sef-orig-bottom') || 'NaN');
+        if (!isFinite(origBottom)) return;
+        var bottomPad = 74;
+        var targetBottom = newY + newH - bottomPad;
+
+        // In focused mode keep axis visible in viewport; in normal filtered mode
+        // keep it at the true bottom of filtered content.
+        if (clampToViewport) {
+            var wrap = svg.closest('.chart-wrap-sef-plan');
+            if (wrap && isFinite(wrap.clientHeight) && wrap.clientHeight > 0) {
+                var visibleBottom = newY + wrap.clientHeight - 40;
+                targetBottom = Math.min(targetBottom, visibleBottom);
+            }
+        }
+
+        var dy = targetBottom - origBottom;
+        var dx = isFinite(xShift) ? xShift : 0;
+        axis.setAttribute('transform', 'translate(' + dx.toFixed(1) + ' ' + dy.toFixed(1) + ')');
+    }
+
+    function resizeFocusedWrap(svg, newH) {
+        var wrap = svg.closest('.chart-wrap-sef-plan');
+        if (!wrap) return;
+        var focusedH = Math.max(320, Math.ceil(newH) + 14);
+        wrap.style.minHeight = focusedH + 'px';
+        wrap.style.height = focusedH + 'px';
+    }
+
+    function _parseTranslateY(transform) {
+        var tr = _extractTranslate(transform);
+        return isFinite(tr.y) ? tr.y : 0;
+    }
+
+    function applyFocusTimelineShift(svg, dx) {
+        if (!isFinite(dx) || Math.abs(dx) < 0.5) return;
+
+        svg.querySelectorAll('[data-sef-row="1"][data-sef-key]').forEach(function (node) {
+            if (!_isShown(node, svg)) return;
+            var role = (node.getAttribute('data-sef-role') || '').trim();
+            var clip = String(node.getAttribute('clip-path') || '');
+            var id = String(node.getAttribute('id') || '');
+            if (clip.indexOf('sef-plan-label-col') !== -1) return;
+            if (_isInLabelClipRegion(node, svg)) return;
+            if (id.indexOf('sef-chev-') === 0) return;
+            var key = (node.getAttribute('data-sef-key') || '').trim();
+            if (!key) return;
+            if (_hasAncestorWithSameKey(node, key, svg)) return;
+            var dy = _parseTranslateY(node.getAttribute('transform'));
+            node.setAttribute('transform', 'translate(' + dx.toFixed(1) + ' ' + dy.toFixed(1) + ')');
+        });
+
+        svg.querySelectorAll('[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+            if (!_isShown(node, svg)) return;
+            var dy = _parseTranslateY(node.getAttribute('transform'));
+            node.setAttribute('transform', 'translate(' + dx.toFixed(1) + ' ' + dy.toFixed(1) + ')');
+        });
+    }
+
+    function restoreXAxisPosition(svg) {
+        var axis = svg.querySelector('#sef-x-axis');
+        if (!axis) return;
+        axis.removeAttribute('transform');
+    }
+
+    function compactVisibleRows(svg, visibleSet, anchorSet) {
+        var rowNodes = Array.from(svg.querySelectorAll('[data-sef-row="1"][data-sef-key]')).filter(function (node) {
+            var role = (node.getAttribute('data-sef-role') || '').trim();
+            return role !== 'chapter-border' && role !== 'package-lane';
+        });
+        var byKey = new Map();
+
+        rowNodes.forEach(function (node) {
+            if (!_isShown(node, svg)) return;
+            var key = (node.getAttribute('data-sef-key') || '').trim();
+            if (!key || !visibleSet.has(key)) return;
+            var existing = byKey.get(key);
+            if (!existing) {
+                existing = { minY: Infinity, maxY: -Infinity, nodes: [], hasBounds: false };
+                byKey.set(key, existing);
+            }
+            existing.nodes.push(node);
+
+            var box = _effectiveBox(node);
+            if (!_isReasonableRowBox(node, box)) return;
+            if (!box || !isFinite(box.y) || !isFinite(box.height)) return;
+            existing.minY = Math.min(existing.minY, box.y);
+            existing.maxY = Math.max(existing.maxY, box.y + box.height);
+            existing.hasBounds = true;
+        });
+
+        var rows = Array.from(byKey.entries()).filter(function (entry) { return entry[1].hasBounds; });
+        rows.sort(function (a, b) { return a[1].minY - b[1].minY; });
+        if (!rows.length) return;
+
+        var rowGap = 6;
+        var cursor = rows[0][1].minY;
+        var shifts = new Map();
+        rows.forEach(function (entry) {
+            var key = entry[0];
+            var rec = entry[1];
+            var targetTop = cursor;
+            var dy = targetTop - rec.minY;
+            shifts.set(key, dy);
+            rec.nodes.forEach(function (node) {
+                if (_hasAncestorWithSameKey(node, key, svg)) return;
+                node.setAttribute('transform', 'translate(0 ' + dy + ')');
+            });
+            cursor = targetTop + (rec.maxY - rec.minY) + rowGap;
+        });
+
+        svg.querySelectorAll('[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+            if (!_isShown(node, svg)) return;
+            var from = (node.getAttribute('data-sef-dep-from') || '').trim();
+            var to = (node.getAttribute('data-sef-dep-to') || '').trim();
+            var fromShift = shifts.get(from) || 0;
+            var toShift = shifts.get(to) || 0;
+            var depShift = (fromShift + toShift) / 2;
+            node.setAttribute('transform', 'translate(0 ' + depShift + ')');
+        });
+
+        var allVisible = Array.from(svg.querySelectorAll('[data-sef-key]')).filter(function (node) {
+            if (!_isShown(node, svg)) return false;
+            var role = (node.getAttribute('data-sef-role') || '').trim();
+            if (role === 'chapter-border' || role === 'package-lane') return false;
+            return true;
+        });
+        if (!allVisible.length) return;
+        var minY = Infinity;
+        var maxY = -Infinity;
+        allVisible.forEach(function (node) {
+            var box = _effectiveBox(node);
+            if (!_isReasonableRowBox(node, box)) return;
+            if (!box || !isFinite(box.y) || !isFinite(box.height)) return;
+            minY = Math.min(minY, box.y);
+            maxY = Math.max(maxY, box.y + box.height);
+        });
+        if (!isFinite(minY) || !isFinite(maxY)) return;
+
+        var originalViewBox = (svg.getAttribute('data-sef-orig-viewbox') || svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+        if (originalViewBox.length !== 4 || originalViewBox.some(function (n) { return !isFinite(n); })) return;
+        var padTop = 62;
+        var padBottom = 90;
+        var newY = Math.max(0, minY - padTop);
+        var newH = Math.max(260, (maxY - minY) + padTop + padBottom);
+
+        // Collapse the horizontal axis to visible timeline data while preserving the label column.
+        var axisLeft = 0;
+        var labelClip = svg.querySelector('#sef-plan-label-col rect');
+        if (labelClip) {
+            axisLeft = (parseFloat(labelClip.getAttribute('x')) || 0) + (parseFloat(labelClip.getAttribute('width')) || 0) + 8;
+        }
+
+        var minDataX = Infinity;
+        var maxDataX = -Infinity;
+        var timelineNodes = Array.from(svg.querySelectorAll('[data-sef-row="1"][data-sef-key],[data-sef-dep-from][data-sef-dep-to]'));
+        timelineNodes.forEach(function (node) {
+            if (!_isShown(node, svg)) return;
+            var nodeId = String(node.getAttribute('id') || '');
+            if (nodeId.indexOf('sef-chev-') === 0) return;
+            var rowKey = (node.getAttribute('data-sef-key') || '').trim();
+            if (rowKey && !visibleSet.has(rowKey)) return;
+            if (rowKey && anchorSet && anchorSet.size && !anchorSet.has(rowKey)) return;
+            if (_isInLabelClipRegion(node, svg)) return;
+            var role = (node.getAttribute('data-sef-role') || '').trim();
+            if (role === 'chapter-border' || role === 'package-lane' || role === 'phase-bar') return;
+            if ((node.getAttribute('clip-path') || '').indexOf('sef-plan-label-col') !== -1) return;
+
+            var box = _effectiveBox(node);
+            if (!_isReasonableRowBox(node, box)) return;
+            if (!box || !isFinite(box.x) || !isFinite(box.width)) return;
+
+            var left = Math.max(axisLeft, box.x);
+            var right = box.x + box.width;
+            if (right <= axisLeft + 1) return;
+            minDataX = Math.min(minDataX, left);
+            maxDataX = Math.max(maxDataX, right);
+        });
+
+        var xPadLeft = 24;
+        var xPadRight = 80;
+        var newX = originalViewBox[0];
+        var newW = originalViewBox[2];
+        var xShift = 0;
+        if (isFinite(minDataX) && isFinite(maxDataX) && maxDataX > minDataX) {
+            var desiredDataLeft = axisLeft + 18;
+            if (minDataX > desiredDataLeft) {
+                xShift = desiredDataLeft - minDataX;
+            }
+            applyFocusTimelineShift(svg, xShift);
+
+            // Keep the left origin so the label column remains visible.
+            newX = originalViewBox[0];
+            var shiftedMaxDataX = maxDataX + xShift;
+            var shiftedMinDataX = minDataX + xShift;
+            var desiredRight = Math.min(originalViewBox[0] + originalViewBox[2], shiftedMaxDataX + xPadRight);
+            var minRight = Math.max(axisLeft + 140, shiftedMinDataX - xPadLeft);
+            desiredRight = Math.max(minRight, desiredRight);
+            newW = Math.max(420, desiredRight - newX);
+        }
+
+        repositionFocusedXAxis(svg, newY, newH, xShift, !!(anchorSet && anchorSet.size));
+        svg.setAttribute('viewBox', newX + ' ' + newY + ' ' + newW + ' ' + newH);
+        svg.setAttribute('height', Math.ceil(newH));
+        resizeFocusedWrap(svg, newH);
+    }
+
+    function restoreLaneGeometry(svg) {
+        svg.querySelectorAll('[data-sef-orig-y]').forEach(function (node) {
+            node.setAttribute('y', node.getAttribute('data-sef-orig-y'));
+        });
+        svg.querySelectorAll('[data-sef-orig-height]').forEach(function (node) {
+            node.setAttribute('height', node.getAttribute('data-sef-orig-height'));
+        });
+    }
+
+    function isDescendantOrSelf(candidate, ancestor, parentMap) {
+        var cur = (candidate || '').trim();
+        var guard = 0;
+        while (cur && guard < 64) {
+            if (cur === ancestor) return true;
+            cur = (parentMap[cur] || '').trim();
+            guard += 1;
+        }
+        return false;
+    }
+
+    function collectVisibleBoundsForAncestor(svg, ancestorKey, visibleSet, parentMap) {
+        var minY = Infinity;
+        var maxY = -Infinity;
+        visibleSet.forEach(function (key) {
+            if (!isDescendantOrSelf(key, ancestorKey, parentMap)) return;
+            svg.querySelectorAll('[data-sef-row="1"][data-sef-key="' + key + '"]').forEach(function (node) {
+                if (!_isShown(node, svg)) return;
+                var role = (node.getAttribute('data-sef-role') || '').trim();
+                if (role === 'chapter-border' || role === 'package-lane') return;
+                var box = _effectiveBox(node);
+                if (!_isReasonableRowBox(node, box)) return;
+                if (!box || !isFinite(box.y) || !isFinite(box.height)) return;
+                minY = Math.min(minY, box.y);
+                maxY = Math.max(maxY, box.y + box.height);
+            });
+        });
+        if (!isFinite(minY) || !isFinite(maxY)) return null;
+        return { minY: minY, maxY: maxY };
+    }
+
+    function compactParentLaneHeights(svg, visibleSet, parentMap) {
+        svg.querySelectorAll('rect[data-sef-role="package-lane"][data-sef-key]').forEach(function (lane) {
+            if (!_isShown(lane, svg)) return;
+            var key = (lane.getAttribute('data-sef-key') || '').trim();
+            if (!key || !visibleSet.has(key)) return;
+            var bounds = collectVisibleBoundsForAncestor(svg, key, visibleSet, parentMap);
+            if (!bounds) return;
+            var padTop = 2;
+            var padBottom = 2;
+            lane.setAttribute('y', Math.max(0, bounds.minY - padTop).toFixed(1));
+            lane.setAttribute('height', Math.max(12, (bounds.maxY - bounds.minY) + padTop + padBottom).toFixed(1));
+        });
+
+        svg.querySelectorAll('rect[data-sef-role="chapter-border"][data-sef-key]').forEach(function (border) {
+            if (!_isShown(border, svg)) return;
+            var key = (border.getAttribute('data-sef-key') || '').trim();
+            if (!key || !visibleSet.has(key)) return;
+            var bounds = collectVisibleBoundsForAncestor(svg, key, visibleSet, parentMap);
+            if (!bounds) return;
+            var padTop = 6;
+            var padBottom = 6;
+            border.setAttribute('y', Math.max(0, bounds.minY - padTop).toFixed(1));
+            border.setAttribute('height', Math.max(24, (bounds.maxY - bounds.minY) + padTop + padBottom).toFixed(1));
+        });
+    }
+
+    function updateExpandersForVisibility(svg, focusedMode) {
+        svg.querySelectorAll('text[id^="sef-chev-"][data-sef-key]').forEach(function (chev) {
+            var key = (chev.getAttribute('data-sef-key') || '').trim();
+            if (!key) return;
+            if (!focusedMode) {
+                chev.style.display = '';
+                return;
+            }
+            var sub = document.getElementById('sef-sub-' + key);
+            if (!sub) {
+                chev.style.display = 'none';
+                return;
+            }
+            var hasVisibleChildren = Array.from(sub.querySelectorAll('[data-sef-row="1"][data-sef-key]')).some(function (node) {
+                return _isShown(node, svg);
+            });
+            chev.style.display = hasVisibleChildren ? '' : 'none';
+        });
+    }
+
+    function clearFocus(targetSvg) {
+        targetSvg.querySelectorAll('[data-sef-key]').forEach(function (node) {
+            node.style.display = '';
+        });
+        targetSvg.querySelectorAll('[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+            node.style.display = '';
+        });
+        restoreLaneGeometry(targetSvg);
+        restoreXAxisPosition(targetSvg);
+        targetSvg.querySelectorAll('[data-sef-row="1"][data-sef-key],[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+            node.removeAttribute('transform');
+        });
+        targetSvg.querySelectorAll('.sef-block-link-icon.active').forEach(function (node) {
+            node.classList.remove('active');
+        });
+        updateExpandersForVisibility(targetSvg, false);
+        targetSvg.removeAttribute('data-sef-focus-source');
+        restoreOriginalSvgState(targetSvg);
+    }
+
+    window.sefApplyVisibilityCompaction = function (targetSvg) {
+        if (!targetSvg) return;
+        ensureOriginalSvgState(targetSvg);
+
+        // Always start compaction from original geometry so axis/viewBox are
+        // recalculated from current filter state, not from prior compacted state.
+        restoreOriginalSvgState(targetSvg);
+
+        restoreLaneGeometry(targetSvg);
+        restoreXAxisPosition(targetSvg);
+        targetSvg.querySelectorAll('[data-sef-row="1"][data-sef-key],[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+            node.removeAttribute('transform');
+        });
+
+        var visibleSet = new Set();
+        var hiddenFound = false;
+        targetSvg.querySelectorAll('[data-sef-row="1"][data-sef-key]').forEach(function (node) {
+            var key = (node.getAttribute('data-sef-key') || '').trim();
+            if (!key) return;
+            if (_isShown(node, targetSvg)) {
+                visibleSet.add(key);
+            } else {
+                hiddenFound = true;
+            }
+        });
+
+        if (!hiddenFound || !visibleSet.size) {
+            updateExpandersForVisibility(targetSvg, false);
+            restoreOriginalSvgState(targetSvg);
+            return;
+        }
+
+        var parentMap = {};
+        var pm = targetSvg.querySelector('#sef-pm');
+        if (pm) {
+            try {
+                parentMap = JSON.parse((pm.getAttribute('data-parent-map') || '{}').replace(/&quot;/g, '"'));
+            } catch (_err) {
+                parentMap = {};
+            }
+        }
+
+        compactVisibleRows(targetSvg, visibleSet, null);
+        compactParentLaneHeights(targetSvg, visibleSet, parentMap);
+        updateExpandersForVisibility(targetSvg, true);
+    };
+
+    window.sefToggleBlockedFocus = function (evt, sourceKey, linkedCsv) {
+        if (evt && typeof evt.stopPropagation === 'function') evt.stopPropagation();
+        if (evt && typeof evt.preventDefault === 'function') evt.preventDefault();
+        var source = (sourceKey || '').trim();
+        if (!source) return;
+
+        var icon = evt && evt.currentTarget ? evt.currentTarget : null;
+        var svg = icon ? icon.closest('svg') : null;
+        if (!svg) return;
+        ensureOriginalSvgState(svg);
+
+        var focused = (svg.getAttribute('data-sef-focus-source') || '').trim();
+        if (focused === source) {
+            clearFocus(svg);
+            return;
+        }
+
+        var linked = (linkedCsv || '').split(',').map(function (item) { return item.trim(); }).filter(Boolean);
+        var visible = new Set([source]);
+        linked.forEach(function (key) { visible.add(key); });
+        var anchor = new Set(visible);
+
+        var parentMap = {};
+        var pmEl = document.getElementById('sef-pm');
+        if (pmEl) {
+            try {
+                parentMap = JSON.parse((pmEl.getAttribute('data-parent-map') || '{}').replace(/&quot;/g, '"'));
+            } catch (_err) {
+                parentMap = {};
+            }
+        }
+        var queue = Array.from(visible);
+        while (queue.length) {
+            var child = queue.pop();
+            var parent = (parentMap[child] || '').trim();
+            if (parent && !visible.has(parent)) {
+                visible.add(parent);
+                queue.push(parent);
+            }
+        }
+
+        svg.querySelectorAll('[data-sef-key]').forEach(function (node) {
+            var key = (node.getAttribute('data-sef-key') || '').trim();
+            node.style.display = visible.has(key) ? '' : 'none';
+        });
+
+        svg.querySelectorAll('[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+            var from = (node.getAttribute('data-sef-dep-from') || '').trim();
+            var to = (node.getAttribute('data-sef-dep-to') || '').trim();
+            node.style.display = (visible.has(from) && visible.has(to)) ? '' : 'none';
+        });
+
+        svg.querySelectorAll('[data-sef-row="1"][data-sef-key],[data-sef-dep-from][data-sef-dep-to]').forEach(function (node) {
+            node.removeAttribute('transform');
+        });
+        restoreLaneGeometry(svg);
+        compactVisibleRows(svg, visible, anchor);
+        compactParentLaneHeights(svg, visible, parentMap);
+        updateExpandersForVisibility(svg, true);
+
+        svg.querySelectorAll('.sef-block-link-icon.active').forEach(function (node) {
+            node.classList.remove('active');
+        });
+        if (icon && icon.classList) icon.classList.add('active');
+        svg.setAttribute('data-sef-focus-source', source);
+    };
+
+  window.sefToggleChapter = function (evt, key) {
+    evt.stopPropagation();
+    var sub = document.getElementById('sef-sub-' + key);
+    var border = document.getElementById('sef-bd-' + key);
+    var chev = document.getElementById('sef-chev-' + key);
+    var chGroup = document.getElementById('sef-ch-' + key);
+    if (!sub || !chGroup) return;
+
+    var isOpen = sub.getAttribute('visibility') !== 'hidden' && sub.style.display !== 'none';
+    var subH = parseInt(chGroup.getAttribute('data-sub-h'), 10) || 0;
+
+    if (isOpen) {
+      sub.setAttribute('visibility', 'hidden');
+      if (chev) chev.textContent = '▶';
+      var collH = parseInt(chGroup.getAttribute('data-collapsed-h'), 10) || 0;
+      if (border) border.setAttribute('height', collH);
+    } else {
+      sub.setAttribute('visibility', 'visible');
+      if (chev) chev.textContent = '▼';
+      if (border) {
+        var ch = parseInt(chGroup.getAttribute('data-collapsed-h'), 10) || 0;
+        border.setAttribute('height', ch + subH);
+      }
+    }
+
+    var cmEl = document.getElementById('sef-cm');
+    if (!cmEl) return;
+    var chapters;
+    try { chapters = JSON.parse(cmEl.getAttribute('data-chapters').replace(/&quot;/g, '"')); }
+    catch (e) { return; }
+
+    var cumulativeShift = 0;
+    chapters.forEach(function (ch) {
+      var g = document.getElementById('sef-ch-' + ch.key);
+      if (!g) return;
+      if (cumulativeShift !== 0) {
+        g.setAttribute('transform', 'translate(0,' + cumulativeShift + ')');
+      } else {
+        g.setAttribute('transform', 'translate(0,0)');
+      }
+      var s = document.getElementById('sef-sub-' + ch.key);
+      var collapsed = s && (s.getAttribute('visibility') === 'hidden' || s.style.display === 'none');
+      if (collapsed) cumulativeShift -= ch.subH;
+    });
+
+    var svg = chGroup.closest('svg');
+    if (svg) {
+      var vb = svg.getAttribute('viewBox').split(' ').map(Number);
+      var delta = isOpen ? -subH : subH;
+      vb[3] = Math.max(100, vb[3] + delta);
+      svg.setAttribute('viewBox', vb.join(' '));
+      svg.setAttribute('height', Math.max(100, parseFloat(svg.getAttribute('height')) + delta));
+    }
+  };
+})();
+</script>
 </body>
 </html>

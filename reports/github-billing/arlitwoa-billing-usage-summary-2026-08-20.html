@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GitHub Billing and Usage Summary - 2026-08-20</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      --text: #102a43;
+      --muted: #52606d;
+      --border: #d9e2ec;
+      --accent: #0b69a3;
+      --ok: #137333;
+      --warn: #b26a00;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.45;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 1px 3px rgba(16,42,67,0.08);
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    p.meta { margin: 0; color: var(--muted); font-size: 14px; }
+    .pill {
+      display: inline-block;
+      font-size: 12px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      margin-right: 6px;
+      margin-bottom: 6px;
+      background: #eef5fb;
+    }
+    .ok { color: var(--ok); font-weight: 600; }
+    .warn { color: var(--warn); font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f0f4f8; font-weight: 700; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .small { font-size: 13px; color: var(--muted); }
+    .note { border-left: 4px solid var(--accent); padding: 8px 10px; background: #f1f7fd; margin-top: 10px; }
+    .section-gap { margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>GitHub Billing and Usage Summary</h1>
+      <p class="meta">Generated: 2026-08-20 | Source account: arlitwoa | Scope checked: user + organization</p>
+      <div class="section-gap">
+        <span class="pill">Org: Te-Wananga-o-Aotearoa</span>
+        <span class="pill">API version: 2026-03-10</span>
+        <span class="pill">Auth scopes: admin:org, user, repo, workflow, gist</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>1) Access and Endpoint Findings</h2>
+      <ul>
+        <li><span class="ok">Authenticated as arlitwoa.</span></li>
+        <li><span class="ok">New billing endpoints are active:</span> organizations/ORG/settings/billing/usage and organizations/ORG/settings/billing/budgets.</li>
+        <li><span class="warn">Legacy /settings/billing/actions|packages|shared-storage endpoints are deprecated/moved (HTTP 410).</span></li>
+        <li><span class="warn">Enterprise budgets endpoint was not available with current scopes (needs admin:enterprise if enterprise access is required).</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>2) Organization Billing Budgets</h2>
+      <table>
+        <thead>
+          <tr><th>Budget SKU</th><th>Budget Type</th><th>Scope</th><th class="num">Budget Amount</th><th>Prevent Further Usage</th><th>Alerting</th><th>Recipients</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ai_credits</td><td>BundlePricing</td><td>organization</td><td class="num">200</td><td>true</td><td>true</td><td>arlitwoa</td></tr>
+          <tr><td>codespaces</td><td>ProductPricing</td><td>organization</td><td class="num">0</td><td>true</td><td>true</td><td>arlitwoa</td></tr>
+          <tr><td>packages</td><td>ProductPricing</td><td>organization</td><td class="num">0</td><td>true</td><td>true</td><td>arlitwoa</td></tr>
+          <tr><td>actions</td><td>ProductPricing</td><td>organization</td><td class="num">0</td><td>true</td><td>true</td><td>arlitwoa</td></tr>
+          <tr><td>git_lfs</td><td>ProductPricing</td><td>organization</td><td class="num">0</td><td>true</td><td>true</td><td>arlitwoa</td></tr>
+        </tbody>
+      </table>
+      <p class="small">Interpretation: spending for codespaces, packages, actions, and git_lfs is blocked unless budget values are increased from 0.</p>
+    </div>
+    <div class="card">
+      <h2>3) Organization Copilot Usage (Monthly Lines Returned)</h2>
+      <table>
+        <thead>
+          <tr><th>Month</th><th>SKU</th><th class="num">Quantity</th><th>Unit</th><th class="num">Gross</th><th class="num">Discount</th><th class="num">Net</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2026-08</td><td>Copilot AI Credits</td><td class="num">28004.207924</td><td>AICredits</td><td class="num">280.04207924</td><td class="num">210.0</td><td class="num">70.04207924000002</td></tr>
+          <tr><td>2026-08</td><td>Copilot Business</td><td class="num">4.19354832</td><td>UserMonths</td><td class="num">79.67741808</td><td class="num">0.0</td><td class="num">79.67741808</td></tr>
+        </tbody>
+      </table>
+      <div class="note"><strong>Latest month total (2026-08):</strong> Net 149.71949732000002.</div>
+    </div>
+    <div class="card">
+      <h2>4) User Usage (arlitwoa)</h2>
+      <table>
+        <thead>
+          <tr><th>Month</th><th>Product</th><th>SKU</th><th class="num">Quantity</th><th>Unit</th><th class="num">Gross</th><th class="num">Discount</th><th class="num">Net</th><th>Repository</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2026-06</td><td>actions</td><td>Actions Linux</td><td class="num">378.0</td><td>Minutes</td><td class="num">2.268</td><td class="num">2.268</td><td class="num">0.0</td><td>reporting-hub</td></tr>
+          <tr><td>2026-07</td><td>actions</td><td>Actions Linux</td><td class="num">1614.0</td><td>Minutes</td><td class="num">9.684</td><td class="num">9.684</td><td class="num">0.0</td><td>reporting-hub</td></tr>
+          <tr><td>2026-08</td><td>actions</td><td>Actions Linux</td><td class="num">1741.0</td><td>Minutes</td><td class="num">10.446</td><td class="num">10.446</td><td class="num">0.0</td><td>reporting-hub</td></tr>
+          <tr><td>2026-08</td><td>actions</td><td>Actions Windows</td><td class="num">8.0</td><td>Minutes</td><td class="num">0.08</td><td class="num">0.08</td><td class="num">0.0</td><td>sfdmu-hub</td></tr>
+        </tbody>
+      </table>
+      <p class="small">User budget endpoint returned 404 (no user budget object available for this account path).</p>
+    </div>
+  </div>
+</body>
+</html>

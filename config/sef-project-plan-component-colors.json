@@ -1,0 +1,15 @@
+{
+  "source": "Jira Plans 959 view 1053 — View settings → Color by → Workstream (PDE)",
+  "defaultFill": "#7A869A",
+  "defaultLabel": "All other work items",
+  "workstreams": {
+    "All": "#4C9AFF",
+    "Payroll": "#FFE380",
+    "HCM": "#FF8B66",
+    "Data": "#0052CC",
+    "Integration": "#79F2C0",
+    "Milestone": "#DE350B",
+    "Testing": "#00875A",
+    "Change": "#998DD9"
+  }
+}

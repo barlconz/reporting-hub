@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GitHub Copilot Governance Summary</title>
+  <style>
+    :root {
+      --bg:#f4f8fb;
+      --bg-accent:#e6eff7;
+      --card:#ffffff;
+      --text:#0f2740;
+      --muted:#5b6d7d;
+      --border:#d6e1ea;
+      --accent:#0b69a3;
+      --accent-2:#0f8b6d;
+      --warn:#9a6300;
+      --shadow:0 10px 24px rgba(15,39,64,0.08);
+    }
+    html,body {
+      margin:0;
+      padding:0;
+      background:
+        radial-gradient(1200px 500px at 95% -10%, var(--bg-accent), transparent 70%),
+        var(--bg);
+      color:var(--text);
+      font-family:"Segoe UI",Arial,sans-serif;
+    }
+    .wrap { max-width:1080px; margin:30px auto; padding:0 18px 24px; }
+    .card {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:20px;
+      margin-bottom:16px;
+      box-shadow:var(--shadow);
+    }
+    .hero {
+      background:linear-gradient(120deg, #0b69a3, #0f8b6d);
+      color:#fff;
+      border:0;
+      box-shadow:0 14px 30px rgba(11,105,163,0.25);
+    }
+    h1 { margin:0 0 8px; font-size:30px; letter-spacing:0.2px; }
+    h2 { margin:0 0 12px; font-size:21px; }
+    h3 { margin:18px 0 10px; font-size:16px; color:#12395b; }
+    p.meta { margin:0; color:var(--muted); }
+    .hero p.meta { color:#e9f5ff; }
+    .kpi { font-size:36px; font-weight:700; margin:6px 0 0; color:var(--accent-2); }
+    table { width:100%; border-collapse:separate; border-spacing:0; font-size:14px; overflow:hidden; border-radius:10px; }
+    th,td { border:1px solid var(--border); border-left:0; border-top:0; padding:9px 11px; text-align:left; background:#fff; }
+    th:first-child, td:first-child { border-left:1px solid var(--border); }
+    thead th { background:#edf4fa; font-weight:600; color:#12395b; }
+    tbody tr:nth-child(even) td { background:#fbfdff; }
+    tbody tr.row-no-seat td { background:#fff6e8 !important; }
+    .num { text-align:right; font-variant-numeric:tabular-nums; }
+    .note { border-left:4px solid var(--accent); background:#f1f7fd; padding:10px 12px; border-radius:8px; }
+    .warn { border-left-color:var(--warn); }
+    .group-tag {
+      display:inline-block;
+      font-weight:600;
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      background:#eaf3fb;
+      color:#0f4f7d;
+    }
+    .badge {
+      display:inline-block;
+      font-size:12px;
+      font-weight:600;
+      padding:3px 8px;
+      border-radius:999px;
+    }
+    .badge.yes { background:#e5f7f1; color:#0a6b53; }
+    .badge.no { background:#f7f2e6; color:#8a5a00; }
+    .mono { font-family:Consolas, "Courier New", monospace; font-size:13px; }
+    .pill {
+      display:inline-block;
+      background:#eef5fb;
+      border:1px solid #d6e6f3;
+      color:#1f4b71;
+      border-radius:999px;
+      padding:4px 9px;
+      font-size:12px;
+      margin:2px 0;
+    }
+    .pill.none { background:#f5f7f9; color:#5c6b78; border-color:#dde4ea; }
+    ul { margin:8px 0 0; padding-left:20px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card hero">
+    <h1>GitHub Copilot Governance Summary</h1>
+    <p class="meta">Scope: monthly total, EPC/TWoA split, additions, removals.</p>
+    <p class="meta">Currency display: NZD</p>
+  </div>
+
+  <div class="card">
+    <h2>Total Per Month</h2>
+    <p class="meta">Latest month in org usage feed</p>
+    <p><strong>Month:</strong> 2026-08</p>
+    <p class="kpi">NZD 248.85</p>
+  </div>
+
+    <div class="card">
+        <h2>Billing Configuration, Limits and Alerts</h2>
+        <p class="note"><strong>Enforcement status:</strong> Enabled (based on prevent_further_usage across configured budgets).</p>
+        <h3>Organization Controls</h3>
+        <p class="meta"><strong>Scope:</strong> organization | <strong>Prevent Further Usage:</strong> Yes | <strong>Alerts Enabled:</strong> Yes | <strong>Alert Recipients:</strong> arlitwoa</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th class="num">Budget (NZD)</th>
+                </tr>
+            </thead>
+            <tbody><tr><td>actions</td><td class="num">0.00</td></tr><tr><td>ai_credits</td><td class="num">330.00</td></tr><tr><td>codespaces</td><td class="num">0.00</td></tr><tr><td>git_lfs</td><td class="num">0.00</td></tr><tr><td>packages</td><td class="num">0.00</td></tr></tbody>
+        </table>
+    </div>
+
+  <div class="card">
+    <h2>Breakout Per Group</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Group</th>
+          <th class="num">Users</th>
+          <th class="num">Seated Users</th>
+          <th class="num">Estimated Monthly Seat Cost (NZD)</th>
+                    <th class="num">Cost per Seated User (NZD)</th>
+        </tr>
+      </thead>
+      <tbody><tr><td><span class="group-tag">EPC</span></td><td class="num">6</td><td class="num">3</td><td class="num">56.33</td><td class="num">18.78</td></tr><tr><td><span class="group-tag">TWoA</span></td><td class="num">6</td><td class="num">4</td><td class="num">75.11</td><td class="num">18.78</td></tr></tbody>
+    </table>
+    <p class="note"><strong>Method:</strong> group split is from the latest per-user seat estimate file; values converted from USD using configured FX rate.</p>
+    
+
+    <h3>Users by Group (Full Names)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Group</th>
+          <th>Full Name</th>
+          <th>User Login</th>
+                    <th>Seated Since</th>
+                                        <th>Last Used</th>
+          <th>Has Copilot Seat</th>
+        </tr>
+      </thead>
+      <tbody><tr><td><span class="group-tag">EPC</span></td><td>Brett Alley</td><td><span class="mono">arlitwoa</span></td><td>2025-08-27</td><td>2026-08-20</td><td><span class="badge yes">Seated</span></td></tr><tr><td><span class="group-tag">EPC</span></td><td>Daniel Mladek</td><td><span class="mono">delphym</span></td><td>2025-11-14</td><td>2026-08-20</td><td><span class="badge yes">Seated</span></td></tr><tr><td><span class="group-tag">TWoA</span></td><td>Lenin Kuriakose</td><td><span class="mono">leninkuriakosetwoa</span></td><td>2026-02-03</td><td>2026-08-18</td><td><span class="badge yes">Seated</span></td></tr><tr><td><span class="group-tag">EPC</span></td><td>Levinson Aruja</td><td><span class="mono">levinsonaruja</span></td><td>2026-06-16</td><td>2026-07-23</td><td><span class="badge yes">Seated</span></td></tr><tr><td><span class="group-tag">TWoA</span></td><td>Ross McDougall</td><td><span class="mono">RossTWOA</span></td><td>2026-07-03</td><td>2026-08-19</td><td><span class="badge yes">Seated</span></td></tr><tr><td><span class="group-tag">TWoA</span></td><td>Chris O'Neill</td><td><span class="mono">ChrisONeilltwoa</span></td><td>2026-07-15</td><td>2026-08-19</td><td><span class="badge yes">Seated</span></td></tr><tr><td><span class="group-tag">TWoA</span></td><td>Marina Gomes</td><td><span class="mono">mpgomes-twoa</span></td><td>2026-07-15</td><td>2026-08-19</td><td><span class="badge yes">Seated</span></td></tr><tr class="row-no-seat"><td><span class="group-tag">EPC</span></td><td>Ajit Kuttikatte</td><td><span class="mono">ajitmk</span></td><td>-</td><td>-</td><td><span class="badge no">Not Seated</span></td></tr><tr class="row-no-seat"><td><span class="group-tag">EPC</span></td><td>Jeanne-Marie van Dolleweerd</td><td><span class="mono">JMvD11885</span></td><td>-</td><td>-</td><td><span class="badge no">Not Seated</span></td></tr><tr class="row-no-seat"><td><span class="group-tag">EPC</span></td><td>Matt Belcher</td><td><span class="mono">matt-belcher-twoa</span></td><td>-</td><td>-</td><td><span class="badge no">Not Seated</span></td></tr><tr class="row-no-seat"><td><span class="group-tag">TWoA</span></td><td>Lisa Cruikshank</td><td><span class="mono">ljc-nz</span></td><td>-</td><td>-</td><td><span class="badge no">Not Seated</span></td></tr><tr class="row-no-seat"><td><span class="group-tag">TWoA</span></td><td>Service Account</td><td><span class="mono">itpurchasingtwoa</span></td><td>-</td><td>-</td><td><span class="badge no">Not Seated</span></td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>New Additions Since Last Run</h2>
+    <ul><li><span class="pill none">None</span></li></ul>
+  </div>
+
+  <div class="card">
+    <h2>Removed Since Last Run</h2>
+    <ul><li><span class="pill none">None</span></li></ul>
+  </div>
+</div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "projectKey": "PDE",
   "phaseHubDiscovery": {
-    "jql": "project = PDE AND issuetype = \"Block Level Two\" AND summary ~ \"SEF Phase\" ORDER BY rank ASC, key ASC"
+    "jql": "project = PDE AND issuetype = \"Block Level Two\" AND summary ~ \"SEF Phase\" ORDER BY \"Start date\" ASC, key ASC"
   },
   "manifestFile": "sef-project-plan-blocks.json",
   "chartWindow": {
@@ -11,8 +11,53 @@
   "issueTypes": {
     "chapter": "Block Level One",
     "package": "Block Level Zero",
-    "detail": "Block Level Minus One"
+    "detail": "Block Level Minus One",
+    "testCycle": "Test Cycle",
+    "milestones": [
+      "Meeting Gate",
+      "Milestone",
+      "Milestone Level One"
+    ],
+    "additionalPackageTypes": [
+      "Pre Requisite",
+      "Story"
+    ],
+    "additionalChapterTypes": [
+      "Pre Requisite"
+    ]
   },
+  "filterDimensions": [
+    {
+      "id": "workstream",
+      "label": "Workstream",
+      "sourceField": "workstreams"
+    },
+    {
+      "id": "tenant",
+      "label": "Tenant",
+      "sourceField": "tenant"
+    },
+    {
+      "id": "environment",
+      "label": "Environment",
+      "sourceField": "environment"
+    },
+    {
+      "id": "platforms",
+      "label": "Platforms",
+      "sourceField": "platforms"
+    },
+    {
+      "id": "testTypes",
+      "label": "Test Types",
+      "sourceField": "testTypes"
+    },
+    {
+      "id": "smeCommitment",
+      "label": "SME Commitment",
+      "sourceField": "smeCommitment"
+    }
+  ],
   "scopeLinkType": "Scope",
   "artifacts": {
     "timelineJson": "sef-project-plan-timeline.json",
@@ -28,5 +73,6 @@
     "filterId": "15891",
     "filterName": "smart-sef-block-plan",
     "note": "Jira saved filter controlling all Block issues in scope for the project plan chart. Add/remove issues from this filter to adjust report scope."
-  }
+  },
+  "componentColorsFile": "sef-project-plan-component-colors.json"
 }

@@ -46,6 +46,17 @@ class MilestoneTimelineTests(unittest.TestCase):
         self.assertEqual(start, date(2026, 4, 10))
         self.assertEqual(end, date(2026, 7, 6))
 
+    def test_resolve_milestone_window_keeps_due_past_quarter_end(self):
+        start, end = resolve_milestone_window(
+            start_date="2026-04-01",
+            created="2026-03-01",
+            due_date="2026-12-18",
+            quarter_start=date(2026, 4, 1),
+            quarter_end=date(2026, 8, 20),
+        )
+        self.assertEqual(start, date(2026, 4, 1))
+        self.assertEqual(end, date(2026, 12, 18))
+
     def test_chart_bounds_start_at_earliest_milestone_start(self):
         payload = json.loads(_FIXTURE.read_text(encoding="utf-8"))
         x_min, x_max = milestone_timeline_chart_bounds(
@@ -63,6 +74,17 @@ class MilestoneTimelineTests(unittest.TestCase):
             quarter_end=date(2026, 8, 20),
         )
         self.assertEqual(x_min, date(2026, 4, 15))
+
+    def test_chart_bounds_extend_to_latest_due_date(self):
+        payload = json.loads(_FIXTURE.read_text(encoding="utf-8"))
+        payload["milestones"][0]["dueDate"] = "2026-12-18"
+        payload["milestones"][0]["endDate"] = "2026-12-18"
+        _, x_max = milestone_timeline_chart_bounds(
+            payload["milestones"],
+            quarter_start=date(2026, 4, 1),
+            quarter_end=date(2026, 8, 20),
+        )
+        self.assertEqual(x_max, date(2026, 12, 18))
 
     def test_plot_width_capped_to_report_page(self):
         span_days = 141  # Q2 2026 quarter window

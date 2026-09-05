@@ -1,0 +1,62 @@
+{
+  "projectKey": "SEFK",
+  "phaseHubDiscovery": {
+    "jql": "project = SEFK AND issuetype = Phase ORDER BY \"Start date\" ASC, key ASC"
+  },
+  "scopeFilter": {
+    "filterName": "smart-project-sefk",
+    "note": "Jira saved filter controlling all SEFK schedule issues in scope for the project plan chart."
+  },
+  "chartWindow": {
+    "start": "2026-06-01",
+    "end": "2027-12-31"
+  },
+  "issueTypes": {
+    "phaseHub": "Phase",
+    "subPhase": "Sub-Phase",
+    "workStream": "Work Stream",
+    "epic": "Epic",
+    "milestones": ["Milestone Level One", "Milestone Level Zero"],
+    "gates": ["Gate", "Gate Level One"],
+    "additionalEpicTypes": ["Test Cycle Level One", "Milestone Level One", "Gate", "Gate Level One"]
+  },
+  "subPhaseOrder": [
+    "Mobilisation",
+    "Architecture",
+    "Test",
+    "Cross Phases",
+    "Deploy"
+  ],
+  "scopeIssueTypes": [
+    "Task",
+    "Action",
+    "Sub-task",
+    "Deliverable",
+    "Milestone Level Zero"
+  ],
+  "statusDtrain": {
+    "Not Started": "Dream",
+    "New": "Dream",
+    "Open": "Dream",
+    "On Hold": "Discover",
+    "Draft Review": "Design",
+    "WIP (25%)": "Develop",
+    "WIP (50%)": "Develop",
+    "WIP (75%)": "Develop",
+    "In Progress": "Develop",
+    "Final Review": "Demonstrate",
+    "Approved": "Demonstrate",
+    "Completed": "Drive",
+    "Closed": "Drive"
+  },
+  "artifacts": {
+    "timelineJson": "sefk-project-plan-timeline.json",
+    "htmlFile": "sefk-project-plan-chart.html"
+  },
+  "githubPages": {
+    "publishPath": "docs/sefk/project-plan.html",
+    "sitePath": "sefk/project-plan.html",
+    "pageTitle": "SEFK | Integrated Project Plan"
+  },
+  "notes": "Hierarchy is built from smart-project-sefk filter issues via parent links (Phase → Sub-Phase → Work Stream → Epic). Issues labelled kpmg-deleted (KPMG source removed by sync-hub tombstone) are excluded from scope counts and hierarchy. chartWindow is a fallback only; fetch computes the x-axis from live dates."
+}

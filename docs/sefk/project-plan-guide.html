@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SEFK | Integrated project plan — guide</title>
+  <style>
+.breadcrumb, .report-nav {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+  color: #5e6c84;
+}
+.breadcrumb a, .report-nav a {
+  color: #0052cc;
+  text-decoration: none;
+  font-weight: 600;
+}
+.breadcrumb a:hover, .report-nav a:hover { text-decoration: underline; }
+.breadcrumb .sep, .report-nav .sep { margin: 0 0.35em; color: #97a0af; }
+.breadcrumb .current, .report-nav .current { color: #172b4d; font-weight: 600; }
+
+    :root {
+      --text: #172b4d;
+      --muted: #5e6c84;
+      --border: #dfe1e6;
+      --blue: #0052cc;
+      --page-bg: #f4f5f7;
+      --card: #ffffff;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--text);
+    }
+    body::before {
+      content: "";
+      display: block;
+      height: 8px;
+      background: linear-gradient(90deg, #0052cc, #6554c0, #00875a);
+    }
+    main {
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+    }
+    h1 { font-size: 1.65rem; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+    .lede { color: var(--muted); font-size: 1rem; line-height: 1.55; margin: 0 0 1.5rem; }
+    h2 { font-size: 1.15rem; margin: 2rem 0 0.5rem; }
+    h3 { font-size: 1rem; margin: 1.25rem 0 0.35rem; }
+    p, li, td, th { font-size: 0.95rem; line-height: 1.6; }
+    ul, ol { padding-left: 1.35rem; margin: 0.35rem 0 0.75rem; }
+    a { color: var(--blue); font-weight: 600; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .card-prominent {
+      border-left: 4px solid var(--blue);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0 1rem;
+      font-size: 0.92rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.65rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #fafbfc; font-weight: 600; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.88em;
+      background: #f4f5f7;
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+    }
+    .legend-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.85rem;
+      margin: 0.5rem 0 0;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(9, 30, 66, 0.12);
+      flex-shrink: 0;
+    }
+    footer { margin-top: 2rem; color: var(--muted); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html">TWoA reporting hub</a>
+      <span class="sep">›</span>
+      <a href="index.html">SEFK</a>
+      <span class="sep">›</span>
+      <span class="current">Integrated project plan guide</span>
+    </nav>
+
+    <h1>SEFK integrated project plan — how it works</h1>
+    <p class="lede">
+      This page describes the
+      <a href="project-plan.html">SEFK integrated project plan</a>
+      Gantt: where the data comes from, what each row and bar means, and how to read the colours and controls.
+    </p>
+
+    <div class="card card-prominent">
+      <strong>Live report:</strong>
+      <a href="project-plan.html">Open the integrated project plan Gantt</a>
+      ·
+      <a href="https://arlitwoa.github.io/reporting-hub/sefk/project-plan.html">GitHub Pages mirror</a>
+    </div>
+
+    <h2>What this report shows</h2>
+    <p>
+      A single timeline of the SEFK programme schedule from Jira, organised as four nested layers:
+    </p>
+    <ol>
+      <li><strong>Phase</strong> — top-level programme phase (e.g. Phase 1)</li>
+      <li><strong>Sub-Phase</strong> — major delivery blocks within a phase (e.g. Mobilisation, Architecture and Configure)</li>
+      <li><strong>Work Stream</strong> — functional or delivery stream within a sub-phase (e.g. data migration, HCM)</li>
+      <li><strong>Epic</strong> — schedulable epic rows under each work stream</li>
+    </ol>
+    <p>
+      Each row has a label on the left and a horizontal bar on the right. The bar spans from the issue’s
+      <strong>start date</strong> through its <strong>due date</strong>. Labels also show elapsed, working, and week metrics:
+      <code>(ED … | WD … | W …)</code>.
+    </p>
+
+    <h2>Where the data comes from</h2>
+    <table>
+      <thead>
+        <tr><th>Setting</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Jira project</td><td><code>SEFK</code></td></tr>
+        <tr><td>Scope filter</td><td>Jira saved filter <code>smart-project-sefk</code></td></tr>
+        <tr><td>Hierarchy</td><td>Built from parent links among Phase → Sub-Phase → Work Stream → Epic</td></tr>
+        <tr><td>Scope roll-up (bar colour)</td><td>Child issues of type Task, Action, Sub-task, Deliverable under each epic</td></tr>
+        <tr><td>Chart time axis</td><td>Earliest start to latest due date across all in-scope schedule rows (not clipped to a fixed quarter)</td></tr>
+      </tbody>
+    </table>
+    <p>
+      The published page is regenerated from live Jira when the
+      <a href="https://github.com/arlitwoa/reporting-hub/actions/workflows/github-pages-reports.yml">Refresh GitHub Pages reports</a>
+      workflow runs on <code>main</code> (scheduled and after relevant merges).
+    </p>
+
+    <h2>KPMG → SEFK sync</h2>
+    <p>
+      The Gantt does not read KPMG Jira directly. Schedule authority sits in
+      <strong>KPMG programme Jira</strong> (<code>TWOA</code> on KPMG’s Atlassian site).
+      A one-way sync hub mirrors selected work items into <strong>TWoA Jira</strong>
+      (<code>SEFK</code>), and this report reads the mirror.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Aspect</th><th>Detail</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Source</td><td>KPMG Jira <code>TWOA</code> — epics, tasks, actions, deliverables, and related schedule types</td></tr>
+        <tr><td>Target</td><td>TWoA Jira <code>SEFK</code> — mirrored issues with matching summaries, dates, and statuses</td></tr>
+        <tr><td>Direction</td><td>One-way: KPMG → TWoA</td></tr>
+        <tr><td>Cadence</td><td>Incremental sync every 15–30 minutes, plus a nightly reconcile for catch-up</td></tr>
+        <tr><td>Traceability</td><td><strong>KPMG Reference</strong> field on each synced issue (link to the source <code>TWOA</code> issue); description also notes <code>Source issue: TWOA-…</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>How the schedule hierarchy is built on SEFK</h3>
+    <p>
+      Sync constructs the four Gantt layers in <code>SEFK</code> from KPMG fields and parent links:
+    </p>
+    <ol>
+      <li><strong>Phase</strong> — programme container (currently Phase 1)</li>
+      <li><strong>Sub-Phase</strong> — from KPMG Delivery Phase values (e.g. Mobilisation, Architecture and Configure)</li>
+      <li><strong>Work Stream</strong> — from the delivery phase plus KPMG component (e.g. integration, HCM, data migration)</li>
+      <li><strong>Epic</strong> — synced from matching KPMG epics and parented under the correct work stream</li>
+    </ol>
+    <p>
+      Start and due dates on Phase, Sub-Phase, and Work Stream rows are rolled up from their children
+      (earliest start, latest due). Synced leaf work — tasks, actions, deliverables, and similar types —
+      does not appear as Gantt rows but feeds the <strong>Story Points roll-up</strong> that drives bar colour on epics.
+    </p>
+
+    <h3>What this means for the report</h3>
+    <ul>
+      <li>The chart shows the <code>SEFK</code> mirror as of the last sync run and the last GitHub Pages refresh — not KPMG Jira live.</li>
+      <li>Schedule or status changes in KPMG typically appear here after the next incremental sync (usually within 30 minutes) and the next report publish.</li>
+      <li>To inspect the authoritative source, open the synced issue in Jira and follow the <strong>KPMG Reference</strong> link or the source issue note in the description.</li>
+    </ul>
+
+    <h2>Reading the bars</h2>
+
+    <h3>Rows with scoped child work (Story Points roll-up)</h3>
+    <p>
+      When an epic (or a parent row that inherits child roll-up) has in-scope child issues with Story Points,
+      the bar shows a <strong>D-Train composition</strong>: coloured segments left-to-right from
+      <strong>Drive</strong> (late / done) through to <strong>Dream</strong> (early / not started).
+      Segment width reflects the relative weight of child issues in each D-Train phase.
+    </p>
+    <div class="legend-strip" aria-label="D-Train phase colours">
+      <span class="legend-item"><span class="swatch" style="background:#00875a"></span> Drive</span>
+      <span class="legend-item"><span class="swatch" style="background:#36b37e"></span> Deploy</span>
+      <span class="legend-item"><span class="swatch" style="background:#57d9a3"></span> Demonstrate</span>
+      <span class="legend-item"><span class="swatch" style="background:#a2bd67"></span> Deliver</span>
+      <span class="legend-item"><span class="swatch" style="background:#7f582d"></span> Develop</span>
+      <span class="legend-item"><span class="swatch" style="background:#a0522d"></span> Design</span>
+      <span class="legend-item"><span class="swatch" style="background:#bf2600"></span> Discover</span>
+      <span class="legend-item"><span class="swatch" style="background:#de350b"></span> Dream</span>
+    </div>
+    <p>
+      Click a coloured segment to open a Jira search for the contributing issues in that phase.
+      Hover for counts and percentages in the tooltip.
+    </p>
+
+    <h3>Rows without scoped Story Points</h3>
+    <p>
+      If a schedule row has no in-scope child issues with Story Points, the bar is a
+      <strong>solid colour</strong> derived from that row’s own Jira <strong>status</strong>, mapped to a D-Train phase
+      (for example <em>Not Started</em> → Dream, <em>In Progress</em> → Develop, <em>Completed</em> → Drive).
+    </p>
+
+    <h3>Status → D-Train mapping (SEFK)</h3>
+    <table>
+      <thead>
+        <tr><th>Jira status</th><th>D-Train phase</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Not Started, New, Open</td><td>Dream</td></tr>
+        <tr><td>On Hold</td><td>Discover</td></tr>
+        <tr><td>Draft Review</td><td>Design</td></tr>
+        <tr><td>WIP (25/50/75%), In Progress</td><td>Develop</td></tr>
+        <tr><td>Final Review, Approved</td><td>Demonstrate</td></tr>
+        <tr><td>Completed</td><td>Drive</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Using the chart</h2>
+    <ul>
+      <li><strong>▼ beside sub-phases and work streams</strong> — collapse or expand nested rows. Collapsing a sub-phase hides all work streams and epics beneath it; collapsing a work stream hides its epics only.</li>
+      <li><strong>Row labels</strong> — link to the Jira issue. Work stream labels show the stream suffix only (e.g. <em>data migration</em>) because the sub-phase name is already on the parent row.</li>
+      <li><strong>Horizontal scroll</strong> — when the timeline is wider than the viewport, scroll horizontally (shift + mouse wheel also pans).</li>
+      <li><strong>Today marker</strong> — vertical black line at the current date (Pacific/Auckland).</li>
+      <li><strong>Calendar grid</strong> — light vertical lines at week start (hover for date); dashed lines at month start (hover for month).</li>
+    </ul>
+
+    <h2>What is not shown</h2>
+    <ul>
+      <li>Issues outside the <code>smart-project-sefk</code> filter</li>
+      <li>Issues labelled <code>kpmg-deleted</code> (KPMG source removed; tombstoned by sync-hub)</li>
+      <li>Rejected child issues in scope roll-ups</li>
+      <li>Task-level rows (only the four schedule layers above appear as Gantt rows; tasks/actions feed bar colour only)</li>
+    </ul>
+
+    <footer>
+      Documentation for the SEFK reporting hub programme.
+      Report styling matches the milestone and SEF integrated plan pages.
+    </footer>
+  </main>
+</body>
+</html>

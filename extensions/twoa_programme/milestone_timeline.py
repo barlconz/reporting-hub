@@ -196,15 +196,14 @@ def resolve_milestone_window(
     quarter_start: date,
     quarter_end: date,
 ) -> tuple[date, date]:
-    """Bar from milestone start (or created) through due date, clipped to the delivery quarter."""
+    """Bar from milestone start (or created) through due date.
+
+    Quarter dates are fallbacks only when start/due are missing. Ends are not clipped to
+    the delivery quarter — the milestone report is filter-driven and commonly includes
+    due dates past quarter.endDate.
+    """
     end = _parse_day(due_date) or quarter_end
     start = _parse_day(start_date) or _parse_day(created) or quarter_start
-    if start < quarter_start:
-        start = quarter_start
-    if start > quarter_end:
-        start = quarter_end
-    if end > quarter_end:
-        end = quarter_end
     if end < start:
         end = start
     return start, end
@@ -250,13 +249,36 @@ def milestone_timeline_chart_bounds(
     quarter_start: date,
     quarter_end: date,
 ) -> tuple[date, date]:
-    """X-axis from earliest milestone start through quarter end."""
+    """X-axis from earliest milestone start through latest milestone end/due."""
     starts = [_parse_day(str(milestone.get("startDate") or "")[:10]) for milestone in milestones]
     starts = [day for day in starts if day is not None]
+    ends: list[date] = []
+    for milestone in milestones:
+        end = _parse_day(str(milestone.get("endDate") or "")[:10])
+        due = _parse_day(str(milestone.get("dueDate") or "")[:10])
+        if end is not None:
+            ends.append(end)
+        if due is not None:
+            ends.append(due)
     x_min = min(starts) if starts else quarter_start
-    if x_min > quarter_end:
-        x_min = quarter_end
-    return x_min, quarter_end
+    x_max = max([quarter_end, *ends]) if ends else quarter_end
+    if x_min > x_max:
+        x_min = x_max
+    return x_min, x_max
+
+
+def milestone_report_window_from_rows(
+    milestones: list[dict[str, Any]],
+    *,
+    fallback_start: date,
+    fallback_end: date,
+) -> tuple[date, date]:
+    """Report title/footnote window from milestone start and due/end dates."""
+    return milestone_timeline_chart_bounds(
+        milestones,
+        quarter_start=fallback_start,
+        quarter_end=fallback_end,
+    )
 
 
 def _milestone_start_field_id(adapter: AtlassianAdapter) -> str:
@@ -487,13 +509,19 @@ def fetch_milestone_timeline(
         for milestone in milestones:
             scope_keys = milestone.get("scopeIssueKeys") or []
             scope_issues = [scope_issues_by_key[key] for key in scope_keys if key in scope_issues_by_key]
+            milestone_end = (
+                _parse_day(str(milestone.get("endDate") or "")[:10])
+                or _parse_day(str(milestone.get("dueDate") or "")[:10])
+                or quarter_end
+            )
+            scope_window_end = max(quarter_end, milestone_end)
             if jira_binding is not None:
                 scope_phases, scope_daily, scope_total = build_milestone_scope_phase_daily(
                     scope_issues,
                     changelogs,
                     binding=jira_binding,
                     quarter_start=quarter_start,
-                    quarter_end=quarter_end,
+                    quarter_end=scope_window_end,
                     sp_field=story_points_field,
                 )
             else:
@@ -501,7 +529,7 @@ def fetch_milestone_timeline(
                     scope_issues,
                     changelogs,
                     quarter_start=quarter_start,
-                    quarter_end=quarter_end,
+                    quarter_end=scope_window_end,
                     sp_field=story_points_field,
                 )
                 scope_phases = {}
@@ -514,12 +542,20 @@ def fetch_milestone_timeline(
 
     milestones.sort(key=lambda row: (row.get("dueDate") or "9999-12-31", row.get("key") or ""))
 
+    window_start, window_end = milestone_report_window_from_rows(
+        milestones,
+        fallback_start=quarter_start,
+        fallback_end=quarter_end,
+    )
+
     return {
         "initiativeKey": initiative_key,
         "hubKey": hub_key,
         "hubSummary": hub_fields.get("summary") or "",
-        "quarterStart": quarter_start.isoformat(),
-        "quarterEnd": quarter_end.isoformat(),
+        "quarterStart": window_start.isoformat(),
+        "quarterEnd": window_end.isoformat(),
+        "reportWindowStart": window_start.isoformat(),
+        "reportWindowEnd": window_end.isoformat(),
         "inScopeFilter": in_scope_filter,
         "milestoneReportProject": milestone_report_project,
         "milestoneCount": len(milestones),

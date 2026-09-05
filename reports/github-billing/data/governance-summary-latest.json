@@ -1,0 +1,40 @@
+{
+  "sources": {
+    "per_user_csv": "reports\\github-billing\\per-user-billing-estimates-2026-08-20.csv",
+    "org_usage": "reports\\github-billing\\data\\org-usage-2026-08-20.json"
+  },
+  "monthly": {
+    "month": "2026-08",
+    "net_total_usd": 150.81753786500002
+  },
+  "groups": [
+    {
+      "group": "EPC",
+      "users": 8,
+      "seated_users": 7,
+      "estimated_gross_usd": 79.66
+    },
+    {
+      "group": "TWoA",
+      "users": 4,
+      "seated_users": 0,
+      "estimated_gross_usd": 0.0
+    }
+  ],
+  "additions": [
+    "ChrisONeilltwoa",
+    "JMvD11885",
+    "RossTWOA",
+    "ajitmk",
+    "arlitwoa",
+    "delphym",
+    "itpurchasingtwoa",
+    "leninkuriakosetwoa",
+    "levinsonaruja",
+    "ljc-nz",
+    "matt-belcher-twoa",
+    "mpgomes-twoa"
+  ],
+  "removals": [],
+  "unmapped": []
+}

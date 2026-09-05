@@ -17,6 +17,16 @@ After Pages is enabled: **https://arlitwoa.github.io/reporting-hub/**
 
 Report URLs are unchanged for stability (e.g. `/quarter/`, `/sprint-health/`, `/sef/project-plan.html`). Programme hubs group navigation only.
 
+## Dependency version policy
+
+This repo intentionally pins Artifact core to one tested release version (`0.2.1`) across runtime metadata, local setup guidance, and CI.
+
+When upgrading Artifact core, update all of the following in one change:
+
+1. `pyproject.toml` dependency for `barlconz-artifact-core`
+2. `README.md` wheel download/install examples
+3. `.github/workflows/github-pages-reports.yml` wheel download/install step
+
 ## Setup (local refresh)
 
 **Option A — editable core (development):**
@@ -61,11 +71,63 @@ bash scripts/refresh_github_pages_reports.sh
 # Or run the Python steps from that script in PowerShell (see consumer docs/execution-notes.md)
 ```
 
+Run selected stages only (for faster reruns and narrower troubleshooting):
+
+```powershell
+# Stage list: quarterly, sef, delivery-health, site-index
+bash scripts/refresh_github_pages_reports.sh --list-stages
+
+# Example: refresh only SEF and the site index
+bash scripts/refresh_github_pages_reports.sh --stage sef --stage site-index
+
+# Validate prerequisites only (no report generation)
+bash scripts/refresh_github_pages_reports.sh --preflight-only
+
+# Skip preflight if you are intentionally debugging a partial environment
+bash scripts/refresh_github_pages_reports.sh --skip-preflight --stage site-index
+```
+
+Preflight checks enforce prerequisites before stage execution:
+
+1. Python command is available (`PYTHON` override supported).
+2. Site config exists: `config/github-pages-site.json`.
+3. For Jira-backed stages (`quarterly`, `sef`, `delivery-health`):
+  - `ARTIFACT_PROGRAMME_REGISTRY` (or default `config/programme-registry.json`)
+  - `ARTIFACT_ROLE_REGISTRY` (or default `config/role-registry.json`)
+  - `ARTIFACT_PROFILES_DIR` containing `atlassian.json` and `twoa-programme.json`
+  - `ARTIFACT_LOCAL_CREDENTIALS` file path is set and exists
+
 Commit changed files under `docs/` when snapshots update.
+
+## Credential management (local)
+
+GitHub identities are split by account. Do not rely on one global `gh` login for all repos.
+
+| Concern | Location |
+|---------|----------|
+| GitHub PATs (multi-account) | `C:\development\config\credentials.local.json` |
+| GitHub PAT template | `C:\development\config\credentials.local.template.json` |
+| Shared resolver / push helpers | `scripts/lib/Resolve-GitHubPat.ps1` (or `C:\development\scripts\` override) |
+| Atlassian / Jira | `C:\development\artifact\artifact-core\config\credentials.local.json` via `ARTIFACT_LOCAL_CREDENTIALS` |
+
+Central GitHub file shape:
+
+```json
+{
+  "github": {
+    "barlconz": { "pat": "..." },
+    "arlitwoa": { "pat": "..." }
+  }
+}
+```
+
+Resolution order for pushes: account env var → central credentials file → repo-local legacy fallback.
+
+Optional overrides: `DEV_ROOT`, `DEV_SCRIPTS_DIR`, `DEV_CREDENTIALS_PATH`.
 
 ## Push to GitHub (TWoA / arlitwoa)
 
-Local `gh` may be logged in as a personal account (`barlconz`). Use a **TWoA org PAT** for programmatic push.
+Local `gh` may be logged in as a personal account (`barlconz`). Use a **TWoA org PAT** for programmatic push to this repo.
 
 ### 1. Create a fine-grained PAT
 
@@ -80,26 +142,23 @@ On the TWoA GitHub account that can access `arlitwoa/reporting-hub`:
 ### 2. Push from this machine
 
 ```powershell
-cd C:\development\reporting-hub
+cd C:\development\clients\twoa\reporting-hub
 
-# One-time: save PAT to Windows user profile (prompts securely)
+# One-time: save PAT to central credentials + TWOA_GITHUB_PAT
 powershell -ExecutionPolicy Bypass -File .\scripts\setup_twoa_github_pat.ps1
 # Restart Cursor after this
-
-# Or one session only:
-# $env:TWOA_GITHUB_PAT = "<paste token>"
 
 powershell -ExecutionPolicy Bypass -File .\scripts\push_to_github.ps1
 ```
 
-The script commits staged files if needed, pushes to `main`, and does **not** store the token in `.git/config` (only used for the push URL).
+The script commits staged files if needed, pushes with `-c credential.helper=''`, and does **not** store the token in `.git/config`.
 
-**Feature branches:** `push_to_github.ps1` always pushes to `main`. For a feature branch, use the same PAT inline (see also `artifact-consumer-twoa/docs/execution-notes.md` → *reporting-hub git push*):
+**Feature branches:**
 
 ```powershell
-$auth = "https://x-access-token:$env:TWOA_GITHUB_PAT@github.com/arlitwoa/reporting-hub.git"
-git push $auth HEAD:feature/my-branch
-git remote set-url origin https://github.com/arlitwoa/reporting-hub.git
+powershell -ExecutionPolicy Bypass -File .\scripts\push_to_github.ps1 `
+  -Branch feature/my-branch `
+  -NoCommit
 ```
 
 Open PRs against **`main`** in the GitHub UI if `gh pr create` fails with the TWoA PAT.
@@ -144,6 +203,43 @@ Push from the workflow uses the built-in **`GITHUB_TOKEN`** on `arlitwoa/reporti
 
 Update `githubPages.githubUser` / `repoName` in both reporting configs if the repo is renamed or moved.
 
+## Generated artifact contract
+
+The repository intentionally mixes source code/config and generated report artifacts. Use this contract to decide what to commit.
+
+### Source-of-truth inputs (always review as code)
+
+1. `extensions/` and `scripts/` Python/bash/PowerShell logic
+2. `config/*.json` report and navigation configuration
+3. `.github/workflows/github-pages-reports.yml`
+4. `README.md` and related docs guidance
+
+### Generated publish outputs (commit when report refresh runs)
+
+1. `docs/index.html`
+2. `docs/epc/**`
+3. `docs/quarter/index.html`
+4. `docs/quarter/milestone.html`
+5. `docs/sprint-health/**`
+6. `docs/dev-done-risk/**`
+7. `docs/sef/**`
+8. `docs/enterprise/**`
+
+These are the artifacts GitHub Pages serves from `main`.
+
+### Operational snapshot artifacts (optional by workflow)
+
+1. `reports/github-billing/**`
+
+Commit these when you intentionally capture/trace a billing data snapshot for governance reporting. Keep them out of unrelated feature commits.
+
+### Commit hygiene rules
+
+1. Prefer separate commits for source changes and generated outputs.
+2. If only generated timestamps/content changed, use a `chore(site): refresh ...` style commit.
+3. If source logic changed, include the regenerated `docs/**` artifacts in the same PR so reviewers can verify output impact.
+4. Avoid mixing `reports/github-billing/**` snapshots into unrelated report or script refactors.
+
 ## Sync from consumer
 
 When reporting code changes in `artifact-consumer-twoa`, re-export:
@@ -160,3 +256,12 @@ Then patch `githubUser` / `repoName` in `config/quarterly-reporting.json` and `c
 $env:ARTIFACT_PROGRAMME_REGISTRY = "C:\development\reporting-hub\config\programme-registry.json"
 python -m unittest discover -s tests -v
 ```
+
+## Architecture decisions and operations
+
+1. ADRs:
+  - `docs/adr/ADR-0001-artifact-core-version-policy.md`
+  - `docs/adr/ADR-0002-stage-based-report-refresh.md`
+  - `docs/adr/ADR-0003-generated-artifact-commit-contract.md`
+2. Publish incident runbook:
+  - `docs/operations/publish-incident-runbook.md`

@@ -5,7 +5,7 @@ For SEF block planning, scope weight is issue-count based (not Story Points).
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 
 from extensions.twoa_programme.delivery_milestones import milestone_linked_issues
 from extensions.twoa_programme.epic_timeline import EPIC_CHILD_ISSUE_TYPES
@@ -86,6 +86,7 @@ def build_block_scope_rollups(
     link_type: str = BLOCK_SCOPE_LINK_TYPE,
     story_points_field: str = "customfield_10026",
     binding=None,
+    skip_issue: Callable[[dict[str, Any]], bool] = issue_excluded_from_analysis,
 ) -> dict[str, dict[str, Any]]:
     """Resolve Scope-linked epics (rollup children) and direct Story/Bug/Spike per block key."""
     epic_keys: set[str] = set()
@@ -115,7 +116,7 @@ def build_block_scope_rollups(
         child_jql = milestone_linked_epic_scope_jql(parent_keys_csv=", ".join(sorted(epic_keys)))
         for child in search_all(adapter, child_jql, scope_fields):
             child_key = str(child.get("key") or "")
-            if not child_key or issue_excluded_from_analysis(child):
+            if not child_key or skip_issue(child):
                 continue
             scope_issues_by_key[child_key] = child
             parent_key = str(((child.get("fields") or {}).get("parent") or {}).get("key") or "")
@@ -127,7 +128,7 @@ def build_block_scope_rollups(
         direct_jql = f"key in ({', '.join(remaining_direct)})"
         for issue in search_all(adapter, direct_jql, scope_fields):
             issue_key = str(issue.get("key") or "")
-            if issue_key:
+            if issue_key and not skip_issue(issue):
                 scope_issues_by_key[issue_key] = issue
 
     rollups: dict[str, dict[str, Any]] = {}

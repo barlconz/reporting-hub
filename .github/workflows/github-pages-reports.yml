@@ -29,6 +29,8 @@ jobs:
     steps:
       - name: Checkout reporting-hub
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -62,23 +64,79 @@ jobs:
           cp config/profiles/twoa-programme.template.json config/profiles/twoa-programme.json
           printf '%s' "$ARTIFACT_CREDENTIALS_JSON" > /tmp/credentials.local.json
 
-      - name: Refresh report snapshots
+      - name: Refresh quarterly snapshots
         env:
           ARTIFACT_PROGRAMME_REGISTRY: ${{ github.workspace }}/config/programme-registry.json
           ARTIFACT_PROFILES_DIR: ${{ github.workspace }}/config/profiles
           ARTIFACT_ROLE_REGISTRY: ${{ github.workspace }}/config/role-registry.json
           ARTIFACT_LOCAL_CREDENTIALS: /tmp/credentials.local.json
           ARTIFACT_USER_EMAIL: ${{ secrets.ARTIFACT_USER_EMAIL }}
-        run: bash scripts/refresh_github_pages_reports.sh
+        run: bash scripts/refresh_github_pages_reports.sh --stage quarterly
+
+      - name: Refresh SEF snapshots
+        env:
+          ARTIFACT_PROGRAMME_REGISTRY: ${{ github.workspace }}/config/programme-registry.json
+          ARTIFACT_PROFILES_DIR: ${{ github.workspace }}/config/profiles
+          ARTIFACT_ROLE_REGISTRY: ${{ github.workspace }}/config/role-registry.json
+          ARTIFACT_LOCAL_CREDENTIALS: /tmp/credentials.local.json
+          ARTIFACT_USER_EMAIL: ${{ secrets.ARTIFACT_USER_EMAIL }}
+        run: bash scripts/refresh_github_pages_reports.sh --stage sef
+
+      - name: Refresh SEFK snapshots
+        env:
+          ARTIFACT_PROGRAMME_REGISTRY: ${{ github.workspace }}/config/programme-registry.json
+          ARTIFACT_PROFILES_DIR: ${{ github.workspace }}/config/profiles
+          ARTIFACT_ROLE_REGISTRY: ${{ github.workspace }}/config/role-registry.json
+          ARTIFACT_LOCAL_CREDENTIALS: /tmp/credentials.local.json
+          ARTIFACT_USER_EMAIL: ${{ secrets.ARTIFACT_USER_EMAIL }}
+        run: bash scripts/refresh_github_pages_reports.sh --stage sefk
+
+      - name: Refresh delivery health snapshots
+        env:
+          ARTIFACT_PROGRAMME_REGISTRY: ${{ github.workspace }}/config/programme-registry.json
+          ARTIFACT_PROFILES_DIR: ${{ github.workspace }}/config/profiles
+          ARTIFACT_ROLE_REGISTRY: ${{ github.workspace }}/config/role-registry.json
+          ARTIFACT_LOCAL_CREDENTIALS: /tmp/credentials.local.json
+          ARTIFACT_USER_EMAIL: ${{ secrets.ARTIFACT_USER_EMAIL }}
+        run: bash scripts/refresh_github_pages_reports.sh --stage delivery-health
+
+      - name: Refresh site index
+        env:
+          ARTIFACT_PROGRAMME_REGISTRY: ${{ github.workspace }}/config/programme-registry.json
+          ARTIFACT_PROFILES_DIR: ${{ github.workspace }}/config/profiles
+          ARTIFACT_ROLE_REGISTRY: ${{ github.workspace }}/config/role-registry.json
+          ARTIFACT_LOCAL_CREDENTIALS: /tmp/credentials.local.json
+          ARTIFACT_USER_EMAIL: ${{ secrets.ARTIFACT_USER_EMAIL }}
+        run: bash scripts/refresh_github_pages_reports.sh --stage site-index
 
       - name: Commit and publish if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html docs/epc docs/enterprise docs/quarter/index.html docs/quarter/milestone.html docs/sprint-health docs/dev-done-risk docs/sef
+          git add docs/index.html docs/epc docs/enterprise docs/quarter/index.html docs/quarter/milestone.html docs/sprint-health docs/dev-done-risk docs/sef docs/sefk
           if git diff --staged --quiet; then
             echo "No report snapshot changes to publish."
             exit 0
           fi
           git commit -m "Refresh GitHub Pages report snapshots [skip ci]"
-          git push
+
+          # Handle non-fast-forward races when main advances during this run.
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              echo "Push succeeded on attempt $attempt"
+              exit 0
+            fi
+
+            echo "Push failed on attempt $attempt; rebasing on latest origin/main"
+            git fetch origin main
+            if ! git -c rebase.autoStash=true rebase origin/main; then
+              git rebase --abort || true
+              # Generated snapshot files commonly conflict when another run lands first.
+              # Treat this as a benign race: keep workflow green and let the next run publish.
+              echo "Rebase conflict while publishing snapshot commit; likely concurrent snapshot update. Skipping publish for this run."
+              exit 0
+            fi
+          done
+
+          echo "Push failed after 3 attempts."
+          exit 1

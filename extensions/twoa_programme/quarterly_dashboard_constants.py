@@ -57,6 +57,7 @@ ATL = {
     "text_subtle": "#5e6c84",
     "line": "#dfe1e6",
     "grid": "#ebecf0",
+    "page": "#f4f5f7",
     "blue": "#0052cc",
     "green": "#00875a",
     "red": "#de350b",
@@ -69,7 +70,7 @@ ATL = {
     "release_out_cycle": "#ffc400",
 }
 SPRINT_FILL = (ATL["sprint_a"], ATL["sprint_b"])
-SVG_FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif'
+SVG_FONT = '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif'
 Y_AXIS_LEFT = 76
 CHART_AXIS_FONT = 10
 REF_PLOT_HEIGHT = 272

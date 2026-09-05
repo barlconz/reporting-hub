@@ -48,6 +48,23 @@
           "href": "sef/plans/test-strategy.html",
           "title": "Test Strategy | Testing Stream | Block Schedule",
           "description": "Testing stream test strategy schedule from PDE Block rows"
+        },
+        {
+          "href": "sef/plans/sef-plan-959-test-cycles-only-excluding-prt-regression.html",
+          "title": "Test Strategy | Plan 959 | Test Cycles + Pre Requisites",
+          "description": "interactive schedule with filters, dependencies, and collapsed child groups"
+        }
+      ]
+    },
+    {
+      "id": "sefk",
+      "title": "SEFK",
+      "description": "Student Experience Framework — Kaiako stream integrated project planning.",
+      "reports": [
+        {
+          "href": "sefk/project-plan.html",
+          "title": "Integrated project plan",
+          "description": "Phase → Sub-Phase → Work Stream → Epic Gantt with D-Train scope colours"
         }
       ]
     },
@@ -55,7 +72,13 @@
       "id": "enterprise",
       "title": "Enterprise reporting",
       "description": "Cross-programme and enterprise-wide reporting snapshots.",
-      "reports": []
+      "reports": [
+        {
+          "href": "enterprise/github-copilot-governance.html",
+          "title": "GitHub Copilot governance summary",
+          "description": "monthly total, EPC/TWoA split, plus user additions and removals since last run"
+        }
+      ]
     }
   ]
 }

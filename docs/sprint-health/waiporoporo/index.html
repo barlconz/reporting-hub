@@ -169,13 +169,31 @@
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 24px;
         }
+
+.breadcrumb, .report-nav {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+  color: #5e6c84;
+}
+.breadcrumb a, .report-nav a {
+  color: #0052cc;
+  text-decoration: none;
+  font-weight: 600;
+}
+.breadcrumb a:hover, .report-nav a:hover { text-decoration: underline; }
+.breadcrumb .sep, .report-nav .sep { margin: 0 0.35em; color: #97a0af; }
+.breadcrumb .current, .report-nav .current { color: #172b4d; font-weight: 600; }
+
 </style>
 </head>
 <body>
 <main class="report-shell">
+<nav class="report-nav" aria-label="Breadcrumb"><a href="../../index.html">TWoA reporting hub</a> <span class="sep">›</span> <a href="../../epc/index.html">EPC delivery</a> <span class="sep">›</span> <span class="current">Sprint Health Report: Waiporoporo | Waiporoporo | Sprint 27</span></nav>
+
 <header class="report-header">
 <h1>Sprint Health Report: Waiporoporo | Waiporoporo | Sprint 27</h1>
-<p class="report-subtitle">Generated Fri 24 Jul 2026 12:02 NZST</p>
+<p class="report-subtitle">Generated Fri 04 Sep 2026 19:53 NZST</p>
 <div class="health-line">
 <span class="health-pill green">Green</span>
 <strong>75/100</strong>

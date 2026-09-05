@@ -1,0 +1,216 @@
+{
+  "projectKey": "PDE",
+  "pageTitle": "SEFK | Integrated Project Plan",
+  "chartWindowStart": "2026-06-01",
+  "chartWindowEnd": "2027-06-14",
+  "phaseHubKeys": ["PDE-5001"],
+  "phases": [
+    {
+      "key": "PDE-5001",
+      "summary": "SEFK Phase 1 | Student Experience",
+      "status": "To Do",
+      "startDate": "2026-06-01",
+      "endDate": "2027-06-14",
+      "scopeRollup": {
+        "phases": {
+          "Dream": 2.0,
+          "Discover": 8.0,
+          "Design": 0.0,
+          "Develop": 12.0,
+          "Deliver": 5.0,
+          "Demonstrate": 0.0,
+          "Deploy": 0.0,
+          "Drive": 20.0,
+          "Unknown": 0.0
+        },
+        "phaseIssueKeys": {
+          "Dream": ["EPCE-9101"],
+          "Discover": ["EPCE-9102"],
+          "Design": [],
+          "Develop": ["EPCE-9103"],
+          "Deliver": ["EPCE-9104"],
+          "Demonstrate": [],
+          "Deploy": [],
+          "Drive": ["EPCE-9105", "EPCE-9106"],
+          "Unknown": []
+        },
+        "unpointedCount": 1,
+        "unpointedIssueKeys": ["EPCE-9107"],
+        "storyPoints": 47.0,
+        "totalWeight": 48.0
+      },
+      "subPhases": [
+        {
+          "key": "PDE-5002",
+          "summary": "Mobilisation",
+          "status": "To Do",
+          "startDate": "2026-06-01",
+          "endDate": "2026-07-10",
+          "scopeRollup": {
+            "phases": {
+              "Dream": 0.0,
+              "Discover": 8.0,
+              "Design": 0.0,
+              "Develop": 0.0,
+              "Deliver": 0.0,
+              "Demonstrate": 0.0,
+              "Deploy": 0.0,
+              "Drive": 5.0,
+              "Unknown": 0.0
+            },
+            "phaseIssueKeys": {
+              "Dream": [],
+              "Discover": ["EPCE-9102"],
+              "Design": [],
+              "Develop": [],
+              "Deliver": [],
+              "Demonstrate": [],
+              "Deploy": [],
+              "Drive": ["EPCE-9105"],
+              "Unknown": []
+            },
+            "unpointedCount": 0,
+            "unpointedIssueKeys": [],
+            "storyPoints": 13.0,
+            "totalWeight": 13.0
+          },
+          "workStreams": [
+            {
+              "key": "PDE-5003",
+              "summary": "Functional Stream",
+              "status": "To Do",
+              "startDate": "2026-06-04",
+              "endDate": "2026-07-31",
+              "scopeRollup": {
+                "phases": {
+                  "Dream": 0.0,
+                  "Discover": 8.0,
+                  "Design": 0.0,
+                  "Develop": 0.0,
+                  "Deliver": 0.0,
+                  "Demonstrate": 0.0,
+                  "Deploy": 0.0,
+                  "Drive": 5.0,
+                  "Unknown": 0.0
+                },
+                "phaseIssueKeys": {
+                  "Dream": [],
+                  "Discover": ["EPCE-9102"],
+                  "Design": [],
+                  "Develop": [],
+                  "Deliver": [],
+                  "Demonstrate": [],
+                  "Deploy": [],
+                  "Drive": ["EPCE-9105"],
+                  "Unknown": []
+                },
+                "unpointedCount": 0,
+                "unpointedIssueKeys": [],
+                "storyPoints": 13.0,
+                "totalWeight": 13.0
+              },
+              "epics": [
+                {
+                  "key": "EPCE-8001",
+                  "summary": "Establish student profile foundations",
+                  "status": "Doing",
+                  "startDate": "2026-06-04",
+                  "endDate": "2026-07-15",
+                  "scopeRollup": {
+                    "phases": {
+                      "Dream": 0.0,
+                      "Discover": 8.0,
+                      "Design": 0.0,
+                      "Develop": 0.0,
+                      "Deliver": 0.0,
+                      "Demonstrate": 0.0,
+                      "Deploy": 0.0,
+                      "Drive": 5.0,
+                      "Unknown": 0.0
+                    },
+                    "phaseIssueKeys": {
+                      "Dream": [],
+                      "Discover": ["EPCE-9102"],
+                      "Design": [],
+                      "Develop": [],
+                      "Deliver": [],
+                      "Demonstrate": [],
+                      "Deploy": [],
+                      "Drive": ["EPCE-9105"],
+                      "Unknown": []
+                    },
+                    "unpointedCount": 0,
+                    "unpointedIssueKeys": [],
+                    "storyPoints": 13.0,
+                    "totalWeight": 13.0
+                  }
+                }
+              ]
+            },
+            {
+              "key": "PDE-5004",
+              "summary": "Testing Stream",
+              "status": "To Do",
+              "startDate": "2026-06-08",
+              "endDate": "2026-07-10",
+              "epics": []
+            }
+          ]
+        },
+        {
+          "key": "PDE-5005",
+          "summary": "Architect and Configure",
+          "status": "To Do",
+          "startDate": "2026-07-13",
+          "endDate": "2026-10-23",
+          "workStreams": [
+            {
+              "key": "PDE-5006",
+              "summary": "Integration Stream",
+              "status": "To Do",
+              "startDate": "2026-07-20",
+              "endDate": "2026-10-23",
+              "epics": [
+                {
+                  "key": "EPCE-8002",
+                  "summary": "Allocations integrated into Take2",
+                  "status": "Doing",
+                  "startDate": "2026-07-20",
+                  "endDate": "2026-09-17",
+                  "scopeRollup": {
+                    "phases": {
+                      "Dream": 2.0,
+                      "Discover": 0.0,
+                      "Design": 0.0,
+                      "Develop": 12.0,
+                      "Deliver": 5.0,
+                      "Demonstrate": 0.0,
+                      "Deploy": 0.0,
+                      "Drive": 15.0,
+                      "Unknown": 0.0
+                    },
+                    "phaseIssueKeys": {
+                      "Dream": ["EPCE-9101"],
+                      "Discover": [],
+                      "Design": [],
+                      "Develop": ["EPCE-9103"],
+                      "Deliver": ["EPCE-9104"],
+                      "Demonstrate": [],
+                      "Deploy": [],
+                      "Drive": ["EPCE-9106"],
+                      "Unknown": []
+                    },
+                    "unpointedCount": 1,
+                    "unpointedIssueKeys": ["EPCE-9107"],
+                    "storyPoints": 34.0,
+                    "totalWeight": 35.0
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
